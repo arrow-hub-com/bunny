@@ -242,11 +242,15 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
             padding: 12px 8px 8px;
+        }
+
+        .preview-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 8px;
         }
 
         .age-toggle {
@@ -256,6 +260,20 @@
             font-size: 11px;
             color: white;
             cursor: pointer;
+        }
+
+        .caption-input {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
+            color: #333;
+        }
+
+        .caption-input::placeholder {
+            color: #999;
         }
 
         .toggle-checkbox {
