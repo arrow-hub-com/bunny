@@ -613,7 +613,8 @@
                     id: Date.now() + Math.random(),
                     is_nsfw: false,
                     is_image: file.type.startsWith('image/'),
-                    is_video: file.type.startsWith('video/')
+                    is_video: file.type.startsWith('video/'),
+                    caption: ''
                 };
                 selectedFiles.push(fileObj);
                 createPreview(fileObj);
@@ -635,11 +636,14 @@
                 previewItem.innerHTML = `
                     <${mediaTag} src="${e.target.result}" ${fileObj.is_video ? 'muted' : ''} alt="Preview"></${mediaTag}>
                     <div class="preview-overlay">
-                        <label class="age-toggle">
-                            <input type="checkbox" class="toggle-checkbox" onchange="toggleNSFW(${fileObj.id}, this.checked)">
-                            <span>18+</span>
-                        </label>
-                        <button class="remove-btn" onclick="removeFile(${fileObj.id})">×</button>
+                        <div class="preview-controls">
+                            <label class="age-toggle">
+                                <input type="checkbox" class="toggle-checkbox" onchange="toggleNSFW(${fileObj.id}, this.checked)">
+                                <span>18+</span>
+                            </label>
+                            <button class="remove-btn" onclick="removeFile(${fileObj.id})">×</button>
+                        </div>
+                        <input type="text" class="caption-input" placeholder="Add caption (e.g. model name, location)" onchange="updateCaption(${fileObj.id}, this.value)">
                     </div>
                 `;
                 
@@ -653,6 +657,13 @@
             const fileObj = selectedFiles.find(f => f.id === fileId);
             if (fileObj) {
                 fileObj.is_nsfw = checked;
+            }
+        };
+
+        window.updateCaption = function(fileId, caption) {
+            const fileObj = selectedFiles.find(f => f.id === fileId);
+            if (fileObj) {
+                fileObj.caption = caption;
             }
         };
 
@@ -785,6 +796,7 @@
                             uploaded_by_email: userEmail,
                             is_image: fileObj.is_image,
                             is_video: fileObj.is_video,
+                            caption: fileObj.caption || '',
                             media_url: mediaUrl,
                             thumb_url: thumbUrl,
                             is_nsfw: fileObj.is_nsfw,
