@@ -138,12 +138,12 @@
             pointer-events: none;
         }
 
-        .album-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: #000;
-        }
+       .album-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: #000;
+}
 
         @media (max-width: 768px) {
             .album-cards {
