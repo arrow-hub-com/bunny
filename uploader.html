@@ -1043,6 +1043,8 @@
         async function uploadToBunny(filePath, file) {
             const url = `https://${CONFIG.BUNNY_HOSTNAME}/${CONFIG.BUNNY_STORAGE_ZONE}${filePath}`;
             
+            console.log('Uploading to Bunny:', url);
+            
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -1053,9 +1055,12 @@
             });
 
             if (!response.ok) {
-                throw new Error(`Bunny upload failed: ${response.statusText}`);
+                const errorText = await response.text();
+                console.error('Bunny upload failed:', response.status, errorText);
+                throw new Error(`Bunny upload failed (${response.status}): ${errorText || response.statusText}`);
             }
 
+            console.log('Bunny upload successful');
             return response;
         }
 
