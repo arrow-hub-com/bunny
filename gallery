@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrow Hub - Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            color: #262626;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .back-button:hover {
+            background: #fafafa;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #262626;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .portfolio-section {
+            margin-bottom: 60px;
+        }
+
+        .albums-section {
+            margin-bottom: 40px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 4px;
+            margin-bottom: 40px;
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        @media (max-width: 768px) {
+            .grid-4 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .grid-item {
+            position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            cursor: pointer;
+            background: #000;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .grid-item.blurred img {
+            filter: blur(20px);
+        }
+
+        .grid-item .blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+        }
+
+        .grid-item.blurred .blur-overlay {
+            display: flex;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5em;
+            pointer-events: none;
+        }
+
+        .album-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .album-card {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .album-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .album-card-cover {
+            position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .album-card-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .album-card-cover.blurred img {
+            filter: blur(20px);
+        }
+
+        .album-card-cover .nsfw-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .album-card-info {
+            padding: 15px;
+        }
+
+        .album-card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .album-card-description {
+            font-size: 0.9em;
+            color: #8e8e8e;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .album-card-count {
+            font-size: 0.85em;
+            color: #8e8e8e;
+        }
+
+        .age-verification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .age-verification.show {
+            display: flex;
+        }
+
+        .age-verification-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .age-verification-content h2 {
+            margin-bottom: 20px;
+            color: #262626;
+        }
+
+        .age-verification-content p {
+            margin-bottom: 30px;
+            color: #8e8e8e;
+            line-height: 1.6;
+        }
+
+        .age-verification-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .age-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .age-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .age-btn-yes {
+            background: #0095f6;
+            color: white;
+        }
+
+        .age-btn-no {
+            background: #efefef;
+            color: #262626;
+        }
+
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .lightbox.show {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lightbox-media {
+            max-width: 90vw;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .lightbox-video {
+            max-width: 90vw;
+            max-height: 80vh;
+        }
+
+        .lightbox-caption {
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10001;
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .lightbox-prev {
+            left: 20px;
+        }
+
+        .lightbox-next {
+            right: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8e8e8e;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0095f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8e8e8e;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Loading gallery...</div>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <a href="#" class="back-button hidden" id="backButton">
+                ← Back to Gallery
+            </a>
+
+            <div id="portfolioView">
+                <div class="portfolio-section" id="portfolioSection">
+                    <h2 class="section-title">Portfolio</h2>
+                    <div class="grid grid-4" id="portfolioGrid"></div>
+                </div>
+
+                <div class="albums-section">
+                    <h2 class="section-title">Albums</h2>
+                    <div class="album-cards" id="albumCards"></div>
+                </div>
+            </div>
+
+            <div id="albumView" class="hidden">
+                <h2 class="section-title" id="albumViewTitle"></h2>
+                <div class="grid grid-4" id="albumViewGrid"></div>
+            </div>
+
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">📸</div>
+                <div>No photos yet</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="age-verification" id="ageVerification">
+        <div class="age-verification-content">
+            <h2>🔞 Age Verification</h2>
+            <p>This content may contain artistic nudity and mature themes. You must be 18 or older to view.</p>
+            <div class="age-verification-buttons">
+                <button class="age-btn age-btn-no" onclick="declineAge()">I'm under 18</button>
+                <button class="age-btn age-btn-yes" onclick="confirmAge()">I'm 18+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">×</button>
+        <button class="lightbox-nav lightbox-prev" onclick="prevMedia()">‹</button>
+        <button class="lightbox-nav lightbox-next" onclick="nextMedia()">›</button>
+        <div class="lightbox-content">
+            <img class="lightbox-media hidden" id="lightboxImage">
+            <video class="lightbox-video hidden" id="lightboxVideo" controls></video>
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
+            FETCH_ALBUMS_WEBHOOK: 'https://hook.eu2.make.com/rvc9yujsjcp1gf8l92pud560vta6r09e',
+            GET_ALBUM_MEDIA_WEBHOOK: 'https://hook.eu2.make.com/7mcus9wexaivddwnln1vle7cpiqs26ga'
+        };
+
+        // State
+        let userEmail = '';
+        let albums = [];
+        let allMedia = [];
+        let currentAlbumMedia = [];
+        let currentAlbum = null;
+        let currentMediaIndex = 0;
+        let isOver18 = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            // Get user email from URL
+            const params = new URLSearchParams(window.location.search);
+            userEmail = params.get('user_email');
+
+            if (!userEmail) {
+                showError('No user profile specified');
+                return;
+            }
+
+            // Check age verification cookie
+            isOver18 = getCookie('arrow_age_verified') === 'true';
+
+            // Load gallery data
+            await loadGallery();
+        }
+
+        async function loadGallery() {
+            try {
+                // Fetch albums for this user
+                const response = await fetch(CONFIG.FETCH_ALBUMS_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_email: userEmail })
+                });
+
+                const text = await response.text();
+                albums = text ? JSON.parse(text) : [];
+
+                if (albums.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+
+                // Fetch media for all albums
+                await loadAllMedia();
+
+                // Render the gallery
+                renderGallery();
+
+                // Show content
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading gallery:', error);
+                showError('Could not load gallery');
+            }
+        }
+
+        async function loadAllMedia() {
+            // Media will be loaded on-demand when albums are opened
+            // This keeps initial page load fast
+        }
+
+        function renderGallery() {
+            const featuredAlbum = albums.find(a => a.is_featured === 'TRUE');
+            const otherAlbums = albums.filter(a => a.is_featured !== 'TRUE');
+
+            // Render portfolio section
+            if (featuredAlbum) {
+                renderPortfolio(featuredAlbum);
+            } else {
+                document.getElementById('portfolioSection').classList.add('hidden');
+            }
+
+            // Render album cards
+            renderAlbumCards(otherAlbums);
+        }
+
+        async function renderPortfolio(album) {
+            try {
+                const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ album_id: album.album_id })
+                });
+
+                const text = await response.text();
+                const media = text ? JSON.parse(text) : [];
+
+                // Limit to 12 items for portfolio
+                const portfolioMedia = media.slice(0, 12);
+
+                const grid = document.getElementById('portfolioGrid');
+                grid.innerHTML = '';
+
+                if (portfolioMedia.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><p>No media in portfolio album</p></div>';
+                    return;
+                }
+
+                portfolioMedia.forEach((item, index) => {
+                    const isNSFW = item.is_nsfw === 'TRUE';
+                    const needsBlur = isNSFW && !isOver18;
+                    const isVideo = item.is_video === 'TRUE';
+
+                    const gridItem = document.createElement('div');
+                    gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
+                    gridItem.onclick = () => {
+                        if (needsBlur) {
+                            showAgeVerification(() => openLightbox(portfolioMedia, index));
+                        } else {
+                            openLightbox(portfolioMedia, index);
+                        }
+                    };
+
+                    gridItem.innerHTML = `
+                        <img src="${item.thumb_url}" alt="">
+                        ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
+                        ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
+                    `;
+
+                    grid.appendChild(gridItem);
+                });
+            } catch (error) {
+                console.error('Error loading portfolio media:', error);
+                document.getElementById('portfolioGrid').innerHTML = '<div class="empty-state"><p>Could not load portfolio</p></div>';
+            }
+        }
+
+        function renderAlbumCards(albumsList) {
+            const container = document.getElementById('albumCards');
+            container.innerHTML = '';
+
+            if (albumsList.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No albums yet</p></div>';
+                return;
+            }
+
+            albumsList.forEach(album => {
+                const card = document.createElement('div');
+                card.className = 'album-card';
+                card.onclick = () => openAlbum(album);
+
+                const isNSFW = album.is_nsfw === 'TRUE';
+                const needsBlur = isNSFW && !isOver18;
+
+                card.innerHTML = `
+                    <div class="album-card-cover ${needsBlur ? 'blurred' : ''}">
+                        <img src="${album.cover_url || 'https://via.placeholder.com/400x300?text=No+Cover'}" alt="${album.album_title}">
+                        ${isNSFW ? '<div class="nsfw-badge">18+</div>' : ''}
+                    </div>
+                    <div class="album-card-info">
+                        <div class="album-card-title">${album.album_title}</div>
+                        <div class="album-card-description">${album.album_description || ''}</div>
+                        <div class="album-card-count">${album.media_count || 0} items</div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        async function openAlbum(album) {
+            const isNSFW = album.is_nsfw === 'TRUE';
+            
+            if (isNSFW && !isOver18) {
+                showAgeVerification(() => {
+                    openAlbum(album);
+                });
+                return;
+            }
+
+            currentAlbum = album;
+            
+            // Hide portfolio view, show album view
+            document.getElementById('portfolioView').classList.add('hidden');
+            document.getElementById('albumView').classList.remove('hidden');
+            document.getElementById('backButton').classList.remove('hidden');
+            document.getElementById('albumViewTitle').textContent = album.album_title;
+
+            // Load and render album media
+            await renderAlbumMedia(album);
+        }
+
+        async function renderAlbumMedia(album) {
+            try {
+                const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ album_id: album.album_id })
+                });
+
+                const text = await response.text();
+                currentAlbumMedia = text ? JSON.parse(text) : [];
+
+                const grid = document.getElementById('albumViewGrid');
+                grid.innerHTML = '';
+
+                if (currentAlbumMedia.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><p>No media in this album</p></div>';
+                    return;
+                }
+
+                currentAlbumMedia.forEach((item, index) => {
+                    const isNSFW = item.is_nsfw === 'TRUE';
+                    const needsBlur = isNSFW && !isOver18;
+                    const isVideo = item.is_video === 'TRUE';
+
+                    const gridItem = document.createElement('div');
+                    gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
+                    gridItem.onclick = () => {
+                        if (needsBlur) {
+                            showAgeVerification(() => openLightbox(currentAlbumMedia, index));
+                        } else {
+                            openLightbox(currentAlbumMedia, index);
+                        }
+                    };
+
+                    gridItem.innerHTML = `
+                        <img src="${item.thumb_url}" alt="">
+                        ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
+                        ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
+                    `;
+
+                    grid.appendChild(gridItem);
+                });
+            } catch (error) {
+                console.error('Error loading album media:', error);
+                document.getElementById('albumViewGrid').innerHTML = '<div class="empty-state"><p>Could not load album</p></div>';
+            }
+        }
+
+        document.getElementById('backButton').onclick = (e) => {
+            e.preventDefault();
+            currentAlbum = null;
+            document.getElementById('albumView').classList.add('hidden');
+            document.getElementById('portfolioView').classList.remove('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+        };
+
+        function showAgeVerification(callback) {
+            document.getElementById('ageVerification').classList.add('show');
+            window.ageVerificationCallback = callback;
+        }
+
+        function confirmAge() {
+            isOver18 = true;
+            setCookie('arrow_age_verified', 'true', 30);
+            document.getElementById('ageVerification').classList.remove('show');
+            
+            if (window.ageVerificationCallback) {
+                window.ageVerificationCallback();
+                window.ageVerificationCallback = null;
+            } else {
+                renderGallery();
+            }
+        }
+
+        function declineAge() {
+            document.getElementById('ageVerification').classList.remove('show');
+            alert('You must be 18 or older to view this content.');
+        }
+
+        function openLightbox(mediaList, index) {
+            currentMediaIndex = index;
+            currentAlbumMedia = mediaList;
+            const media = mediaList[index];
+            
+            document.getElementById('lightbox').classList.add('show');
+            document.getElementById('lightboxCaption').textContent = media.caption || '';
+
+            if (media.is_video === 'TRUE') {
+                document.getElementById('lightboxImage').classList.add('hidden');
+                const video = document.getElementById('lightboxVideo');
+                video.src = media.media_url;
+                video.classList.remove('hidden');
+                video.load();
+            } else {
+                document.getElementById('lightboxVideo').classList.add('hidden');
+                const img = document.getElementById('lightboxImage');
+                img.src = media.media_url;
+                img.classList.remove('hidden');
+            }
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('show');
+            const video = document.getElementById('lightboxVideo');
+            video.pause();
+            video.src = '';
+        }
+
+        function nextMedia() {
+            if (currentMediaIndex < currentAlbumMedia.length - 1) {
+                openLightbox(currentAlbumMedia, currentMediaIndex + 1);
+            }
+        }
+
+        function prevMedia() {
+            if (currentMediaIndex > 0) {
+                openLightbox(currentAlbumMedia, currentMediaIndex - 1);
+            }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function setCookie(name, value, days) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+        }
+
+        function showEmptyState() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+        }
+
+        function showError(message) {
+            document.getElementById('loading').innerHTML = `
+                <div class="empty-state-icon">⚠️</div>
+                <div>${message}</div>
+            `;
+        }
+
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('lightbox').classList.contains('show')) return;
+            
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') prevMedia();
+            if (e.key === 'ArrowRight') nextMedia();
+        });
+    </script>
+</body>
+</html>
