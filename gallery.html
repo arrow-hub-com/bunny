@@ -479,9 +479,13 @@
         document.addEventListener('DOMContentLoaded', init);
 
         async function init() {
+            console.log('Gallery init started');
+            
             // Get user email from URL
             const params = new URLSearchParams(window.location.search);
             userEmail = params.get('user_email');
+            
+            console.log('User email:', userEmail);
 
             if (!userEmail) {
                 showError('No user profile specified');
@@ -490,6 +494,7 @@
 
             // Check age verification cookie
             isOver18 = getCookie('arrow_age_verified') === 'true';
+            console.log('Age verified:', isOver18);
 
             // Load gallery data
             await loadGallery();
@@ -550,6 +555,8 @@
 
         async function renderPortfolio(album) {
             try {
+                console.log('Loading portfolio for album:', album.album_id);
+                
                 const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -557,7 +564,10 @@
                 });
 
                 const text = await response.text();
+                console.log('Portfolio media response:', text);
+                
                 const media = text ? JSON.parse(text) : [];
+                console.log('Parsed portfolio media:', media);
 
                 // Limit to 12 items for portfolio
                 const portfolioMedia = media.slice(0, 12);
@@ -609,22 +619,26 @@
             }
 
             albumsList.forEach(album => {
+                console.log('Rendering album card:', album);
+                
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.onclick = () => openAlbum(album);
 
                 const isNSFW = album.is_nsfw === 'TRUE';
                 const needsBlur = isNSFW && !isOver18;
+                const coverUrl = album.cover_url || '';
+                const mediaCount = album.media_count || 0;
 
                 card.innerHTML = `
                     <div class="album-card-cover ${needsBlur ? 'blurred' : ''}">
-                        <img src="${album.cover_url || 'https://via.placeholder.com/400x300?text=No+Cover'}" alt="${album.album_title}">
+                        ${coverUrl ? `<img src="${coverUrl}" alt="${album.album_title}">` : '<div style="background:#e0e0e0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#999;">No Cover</div>'}
                         ${isNSFW ? '<div class="nsfw-badge">18+</div>' : ''}
                     </div>
                     <div class="album-card-info">
                         <div class="album-card-title">${album.album_title}</div>
                         <div class="album-card-description">${album.album_description || ''}</div>
-                        <div class="album-card-count">${album.media_count || 0} items</div>
+                        <div class="album-card-count">${mediaCount} items</div>
                     </div>
                 `;
 
@@ -656,6 +670,8 @@
 
         async function renderAlbumMedia(album) {
             try {
+                console.log('Loading media for album:', album.album_id);
+                
                 const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -663,7 +679,10 @@
                 });
 
                 const text = await response.text();
+                console.log('Album media response:', text);
+                
                 currentAlbumMedia = text ? JSON.parse(text) : [];
+                console.log('Parsed album media:', currentAlbumMedia);
 
                 const grid = document.getElementById('albumViewGrid');
                 grid.innerHTML = '';
