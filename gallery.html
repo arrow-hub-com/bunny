@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v1.0</title>
+    <title>Arrow Hub - Gallery v2.0</title>
     <style>
         * {
             margin: 0;
@@ -25,7 +25,7 @@
         }
 
         .back-button {
-            display: inline-flex;
+            display: none;
             align-items: center;
             gap: 8px;
             background: white;
@@ -42,6 +42,10 @@
 
         .back-button:hover {
             background: #fafafa;
+        }
+
+        .back-button.show {
+            display: inline-flex;
         }
 
         .section-title {
@@ -372,6 +376,25 @@
             right: 20px;
         }
 
+        .load-more {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: block;
+        }
+
+        .load-more:hover {
+            background: #fafafa;
+        }
+
         .loading {
             text-align: center;
             padding: 60px 20px;
@@ -405,29 +428,7 @@
             opacity: 0.3;
         }
 
-        .load-more {
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 15px;
-            background: white;
-            border: 1px solid #dbdbdb;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: block;
-        }
-
-        .load-more:hover {
-            background: #fafafa;
-        }
-
-        .load-more.hidden {
-            display: none;
-        }
-            .hidden {
+        .hidden {
             display: none !important;
         }
     </style>
@@ -440,7 +441,7 @@
         </div>
 
         <div id="mainContent" class="hidden">
-            <a href="#" class="back-button hidden" id="backButton">
+            <a href="#" class="back-button" id="backButton">
                 ← Back to Gallery
             </a>
 
@@ -492,36 +493,30 @@
     </div>
 
     <script>
-        // Gallery Version 1.2
-        console.log('Arrow Hub Gallery v1.2');
+        // Gallery Version 2.0 - Fresh rebuild
+        console.log('Arrow Hub Gallery v2.0');
         
-        // Configuration
         const CONFIG = {
             BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
             FETCH_ALBUMS_WEBHOOK: 'https://hook.eu2.make.com/rvc9yujsjcp1gf8l92pud560vta6r09e',
             GET_ALBUM_MEDIA_WEBHOOK: 'https://hook.eu2.make.com/7mcus9wexaivddwnln1vle7cpiqs26ga'
         };
 
-        // State
         let userEmail = '';
         let albums = [];
-        let allMedia = [];
         let currentAlbumMedia = [];
         let displayedMediaCount = 0;
         const MEDIA_PER_PAGE = 24;
-        let currentAlbum = null;
         let currentMediaIndex = 0;
         let isOver18 = false;
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', init);
 
         async function init() {
             console.log('Gallery init started');
             
-            // Get user email from URL
             const params = new URLSearchParams(window.location.search);
-            userEmail = params.get('user_email') || 'arrowphtosuk@gmail.com'; // Fallback for preview
+            userEmail = params.get('user_email') || 'arrowphtosuk@gmail.com';
             
             console.log('User email:', userEmail);
 
@@ -530,14 +525,9 @@
                 return;
             }
 
-            // Check age verification cookie
             isOver18 = getCookie('arrow_age_verified') === 'true';
             console.log('Age verified:', isOver18);
 
-            // Ensure back button is hidden on init
-            document.getElementById('backButton').style.display = 'none';
-
-            // Load gallery data
             await loadGallery();
         }
 
@@ -545,8 +535,6 @@
             try {
                 console.log('loadGallery started');
                 
-                // Fetch albums for this user
-                console.log('Fetching albums for:', userEmail);
                 const response = await fetch(CONFIG.FETCH_ALBUMS_WEBHOOK, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -564,13 +552,8 @@
                     return;
                 }
 
-                // Fetch media for all albums
-                await loadAllMedia();
-
-                // Render the gallery
                 renderGallery();
 
-                // Show content
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
 
@@ -580,16 +563,10 @@
             }
         }
 
-        async function loadAllMedia() {
-            // Media will be loaded on-demand when albums are opened
-            // This keeps initial page load fast
-        }
-
         function renderGallery() {
             const featuredAlbum = albums.find(a => a.is_featured === 'TRUE');
             const otherAlbums = albums.filter(a => a.is_featured !== 'TRUE');
 
-            // Render portfolio section
             if (featuredAlbum) {
                 renderPortfolio(featuredAlbum);
                 document.getElementById('portfolioSection').classList.remove('hidden');
@@ -597,7 +574,6 @@
                 document.getElementById('portfolioSection').classList.add('hidden');
             }
 
-            // Render album cards
             renderAlbumCards(otherAlbums);
         }
 
@@ -617,7 +593,6 @@
                 const media = text ? JSON.parse(text) : [];
                 console.log('Parsed portfolio media:', media);
 
-                // Limit to 12 items for portfolio
                 const portfolioMedia = media.slice(0, 12);
 
                 const grid = document.getElementById('portfolioGrid');
@@ -667,8 +642,6 @@
             }
 
             albumsList.forEach(album => {
-                console.log('Rendering album card:', album);
-                
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.onclick = () => openAlbum(album);
@@ -700,21 +673,15 @@
             const isNSFW = album.is_nsfw === 'TRUE';
             
             if (isNSFW && !isOver18) {
-                showAgeVerification(() => {
-                    openAlbum(album);
-                });
+                showAgeVerification(() => openAlbum(album));
                 return;
             }
 
-            currentAlbum = album;
-            
-            // Hide portfolio view, show album view
             document.getElementById('portfolioView').classList.add('hidden');
             document.getElementById('albumView').classList.remove('hidden');
-            document.getElementById('backButton').style.display = 'inline-flex';
+            document.getElementById('backButton').classList.add('show');
             document.getElementById('albumViewTitle').textContent = album.album_title;
 
-            // Load and render album media
             await renderAlbumMedia(album);
         }
 
@@ -730,66 +697,74 @@
 
                 const text = await response.text();
                 console.log('Album media response:', text);
-                console.log('Response type:', typeof text);
                 
-                let parsedData;
-                try {
-                    parsedData = text ? JSON.parse(text) : [];
-                } catch (e) {
-                    console.error('JSON parse error:', e);
-                    console.error('Failed to parse:', text);
-                    throw new Error('Invalid JSON response from webhook');
-                }
-                
-                console.log('Parsed album media:', parsedData);
-                console.log('Is array?', Array.isArray(parsedData));
-                
-                currentAlbumMedia = Array.isArray(parsedData) ? parsedData : [];
+                currentAlbumMedia = text ? JSON.parse(text) : [];
+                console.log('Parsed album media:', currentAlbumMedia);
+                displayedMediaCount = 0;
 
                 const grid = document.getElementById('albumViewGrid');
                 grid.innerHTML = '';
 
                 if (currentAlbumMedia.length === 0) {
                     grid.innerHTML = '<div class="empty-state"><p>No media in this album</p></div>';
+                    document.getElementById('loadMoreBtn').classList.add('hidden');
                     return;
                 }
 
-                currentAlbumMedia.forEach((item, index) => {
-                    const isNSFW = item.is_nsfw === 'TRUE';
-                    const needsBlur = isNSFW && !isOver18;
-                    const isVideo = item.is_video === 'TRUE';
+                loadMoreMedia();
 
-                    const gridItem = document.createElement('div');
-                    gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
-                    gridItem.onclick = () => {
-                        if (needsBlur) {
-                            showAgeVerification(() => openLightbox(currentAlbumMedia, index));
-                        } else {
-                            openLightbox(currentAlbumMedia, index);
-                        }
-                    };
-
-                    gridItem.innerHTML = `
-                        <img src="${item.thumb_url}" alt="">
-                        ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
-                        ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
-                    `;
-
-                    grid.appendChild(gridItem);
-                });
             } catch (error) {
                 console.error('Error loading album media:', error);
                 document.getElementById('albumViewGrid').innerHTML = '<div class="empty-state"><p>Could not load album</p></div>';
             }
         }
 
+        function loadMoreMedia() {
+            const grid = document.getElementById('albumViewGrid');
+            const startIndex = displayedMediaCount;
+            const endIndex = Math.min(startIndex + MEDIA_PER_PAGE, currentAlbumMedia.length);
+
+            for (let i = startIndex; i < endIndex; i++) {
+                const item = currentAlbumMedia[i];
+                const isNSFW = item.is_nsfw === 'TRUE';
+                const needsBlur = isNSFW && !isOver18;
+                const isVideo = item.is_video === 'TRUE';
+
+                const gridItem = document.createElement('div');
+                gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
+                gridItem.onclick = () => {
+                    if (needsBlur) {
+                        showAgeVerification(() => openLightbox(currentAlbumMedia, i));
+                    } else {
+                        openLightbox(currentAlbumMedia, i);
+                    }
+                };
+
+                gridItem.innerHTML = `
+                    <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
+                    ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
+                    ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
+                `;
+
+                grid.appendChild(gridItem);
+            }
+
+            displayedMediaCount = endIndex;
+
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (displayedMediaCount >= currentAlbumMedia.length) {
+                loadMoreBtn.classList.add('hidden');
+            } else {
+                loadMoreBtn.classList.remove('hidden');
+            }
+        }
+
         document.getElementById('backButton').onclick = (e) => {
             e.preventDefault();
-            currentAlbum = null;
             displayedMediaCount = 0;
             document.getElementById('albumView').classList.add('hidden');
             document.getElementById('portfolioView').classList.remove('hidden');
-            document.getElementById('backButton').style.display = 'none';
+            document.getElementById('backButton').classList.remove('show');
             document.getElementById('loadMoreBtn').classList.add('hidden');
         };
 
@@ -807,7 +782,7 @@
                 window.ageVerificationCallback();
                 window.ageVerificationCallback = null;
             } else {
-                renderGallery();
+                location.reload();
             }
         }
 
@@ -881,7 +856,6 @@
             `;
         }
 
-        // Keyboard navigation for lightbox
         document.addEventListener('keydown', (e) => {
             if (!document.getElementById('lightbox').classList.contains('show')) return;
             
