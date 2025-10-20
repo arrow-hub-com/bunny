@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+.hidden {
+            display: none !important;
+        }<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -61,12 +63,17 @@
 
         .grid {
             display: grid;
-            gap: 4px;
+            gap: 1px;
             margin-bottom: 40px;
+            background: #000;
         }
 
         .grid-4 {
             grid-template-columns: repeat(4, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
         }
 
         @media (max-width: 768px) {
@@ -77,7 +84,7 @@
 
         .grid-item {
             position: relative;
-            aspect-ratio: 4/3;
+            aspect-ratio: 3/4;
             overflow: hidden;
             cursor: pointer;
             background: #000;
@@ -135,14 +142,19 @@
 
         .album-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #000;
+        }
+
+        @media (max-width: 768px) {
+            .album-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .album-card {
             background: white;
-            border: 1px solid #dbdbdb;
-            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -155,7 +167,7 @@
 
         .album-card-cover {
             position: relative;
-            aspect-ratio: 4/3;
+            aspect-ratio: 3/4;
             overflow: hidden;
             background: #000;
         }
@@ -395,7 +407,26 @@
             opacity: 0.3;
         }
 
-        .hidden {
+        .load-more {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: block;
+        }
+
+        .load-more:hover {
+            background: #fafafa;
+        }
+
+        .load-more.hidden {
             display: none;
         }
     </style>
@@ -427,6 +458,7 @@
             <div id="albumView" class="hidden">
                 <h2 class="section-title" id="albumViewTitle"></h2>
                 <div class="grid grid-4" id="albumViewGrid"></div>
+                <button class="load-more hidden" id="loadMoreBtn" onclick="loadMoreMedia()">Load More</button>
             </div>
 
             <div class="empty-state hidden" id="emptyState">
@@ -471,6 +503,8 @@
         let albums = [];
         let allMedia = [];
         let currentAlbumMedia = [];
+        let displayedMediaCount = 0;
+        const MEDIA_PER_PAGE = 24;
         let currentAlbum = null;
         let currentMediaIndex = 0;
         let isOver18 = false;
@@ -602,7 +636,7 @@
                     };
 
                     gridItem.innerHTML = `
-                        <img src="${item.thumb_url}" alt="">
+                        <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
                         ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
                         ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
                     `;
@@ -640,7 +674,7 @@
 
                 card.innerHTML = `
                     <div class="album-card-cover ${needsBlur ? 'blurred' : ''}">
-                        ${coverUrl ? `<img src="${coverUrl}" alt="${album.album_title}">` : '<div style="background:#e0e0e0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#999;">No Cover</div>'}
+                        ${coverUrl ? `<img src="${coverUrl}?width=400" alt="${album.album_title}" loading="lazy">` : '<div style="background:#e0e0e0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#999;">No Cover</div>'}
                         ${isNSFW ? '<div class="nsfw-badge">18+</div>' : ''}
                     </div>
                     <div class="album-card-info">
@@ -744,9 +778,11 @@
         document.getElementById('backButton').onclick = (e) => {
             e.preventDefault();
             currentAlbum = null;
+            displayedMediaCount = 0;
             document.getElementById('albumView').classList.add('hidden');
             document.getElementById('portfolioView').classList.remove('hidden');
             document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('loadMoreBtn').classList.add('hidden');
         };
 
         function showAgeVerification(callback) {
