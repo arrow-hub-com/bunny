@@ -543,7 +543,7 @@
     <script>
         // Configuration
         const CONFIG = {
-            BUNNY_STORAGE_PASSWORD: '058d97e0-f5e1-4d4f-b297408ce40f-cc41-42e1', 
+            BUNNY_STORAGE_PASSWORD: '058d97e0-f5e1-4d4f-b297408ce40f-cc41-42e1',
             BUNNY_HOSTNAME: 'ny.storage.bunnycdn.com',
             BUNNY_STORAGE_ZONE: 'arrow-hub',
             BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
@@ -590,11 +590,17 @@
 
         async function loadUserLimits() {
             try {
+                console.log('Fetching user limits for:', userEmail);
+                
                 const response = await fetch(CONFIG.GET_USER_LIMITS_WEBHOOK, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_email: userEmail })
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
                 const data = await response.json();
                 console.log('Received limits data:', data);
@@ -617,7 +623,23 @@
                 updateUsageDisplay();
             } catch (error) {
                 console.error('Error loading user limits:', error);
-                showMessage('error', 'Could not load account limits. Please refresh the page.');
+                
+                // Set default limits so uploader still works
+                userLimits = {
+                    max_media: 500,
+                    max_storage_gb: 25,
+                    max_file_size_mb: 50
+                };
+                
+                userStats = {
+                    media_count: 0,
+                    storage_used_gb: 0
+                };
+                
+                // Still update display with defaults
+                updateUsageDisplay();
+                
+                showMessage('warning', 'Could not load usage stats. Using default limits.');
             }
         }
 
@@ -707,14 +729,23 @@
 
         async function loadAlbums() {
             try {
+                console.log('Fetching albums for:', userEmail);
+                
                 const response = await fetch(CONFIG.FETCH_ALBUMS_WEBHOOK, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_email: userEmail })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const text = await response.text();
+                console.log('Albums response:', text);
+                
                 albums = text ? JSON.parse(text) : [];
+                console.log('Parsed albums:', albums);
 
                 const select = document.getElementById('albumSelect');
                 select.innerHTML = '<option value="">-- Select an Album --</option>';
@@ -727,9 +758,17 @@
                     option.dataset.nsfw = album.is_nsfw;
                     select.appendChild(option);
                 });
+                
+                console.log('Albums loaded successfully');
             } catch (error) {
                 console.error('Error loading albums:', error);
-                showMessage('error', 'Could not load albums. Please refresh the page.');
+                
+                // Set up basic album select even if fetch fails
+                const select = document.getElementById('albumSelect');
+                select.innerHTML = '<option value="">-- Select an Album --</option>';
+                select.innerHTML += '<option value="new">+ Create New Album</option>';
+                
+                showMessage('warning', 'Could not load existing albums. You can still create a new album.');
             }
         }
 
