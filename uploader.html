@@ -574,8 +574,33 @@
 
             document.getElementById('userEmail').textContent = userEmail;
 
-            // Load user limits and stats
-            await loadUserLimits();
+            // Check if limits are provided via URL parameters (from Glide)
+            const urlMaxMedia = params.get('max_media');
+            const urlUsedMedia = params.get('used_media');
+            const urlMaxStorage = params.get('max_storage_gb');
+            const urlUsedStorage = params.get('used_storage_gb');
+            const urlMaxFileSize = params.get('max_file_size_mb');
+
+            if (urlMaxMedia && urlMaxStorage && urlMaxFileSize) {
+                // Use URL parameters (embedded in Glide)
+                console.log('Using limits from URL parameters');
+                userLimits = {
+                    max_media: parseInt(urlMaxMedia),
+                    max_storage_gb: parseFloat(urlMaxStorage),
+                    max_file_size_mb: parseFloat(urlMaxFileSize)
+                };
+                
+                userStats = {
+                    media_count: parseInt(urlUsedMedia) || 0,
+                    storage_used_gb: parseFloat(urlUsedStorage) || 0
+                };
+
+                updateUsageDisplay();
+            } else {
+                // Fallback to webhook call (direct browser access)
+                console.log('URL parameters not found, fetching from webhook');
+                await loadUserLimits();
+            }
 
             // Load albums
             await loadAlbums();
