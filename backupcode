@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Photos - Arrow Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .upload-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .album-selector {
+            margin-bottom: 30px;
+        }
+
+        .album-selector label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .album-select-wrapper {
+            position: relative;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .album-select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #666;
+        }
+
+        .new-album-form {
+            display: none;
+            margin-top: 16px;
+            padding: 20px;
+            background: #f5f7ff;
+            border-radius: 8px;
+        }
+
+        .new-album-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1a1a1a;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .dropzone {
+            border: 3px dashed #ddd;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .dropzone:hover {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .dropzone.dragover {
+            border-color: #667eea;
+            background: #f5f7ff;
+            transform: scale(1.02);
+        }
+
+        .dropzone-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .dropzone h3 {
+            font-size: 20px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .dropzone p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn-browse {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-browse:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f0f0f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 12px 8px 8px;
+        }
+
+        .preview-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .age-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .caption-input {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
+            color: #333;
+        }
+
+        .caption-input::placeholder {
+            color: #999;
+        }
+
+        .toggle-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .remove-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f7ff;
+            border-radius: 12px;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-item {
+            margin-bottom: 16px;
+        }
+
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-file-name {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .upload-btn-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-upload:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            color: #155724;
+            text-align: center;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .upload-container {
+                padding: 24px;
+            }
+
+            .dropzone {
+                padding: 40px 16px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <div class="header">
+            <h1>📸 Upload Your Photos</h1>
+            <p id="userEmail"></p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="album-selector">
+            <label for="albumSelect">Select Album</label>
+            <div class="album-select-wrapper">
+                <select id="albumSelect">
+                    <option value="">Loading albums...</option>
+                </select>
+            </div>
+
+            <div class="new-album-form" id="newAlbumForm">
+                <div class="form-group">
+                    <label>Album Title*</label>
+                    <input type="text" id="newAlbumTitle" placeholder="e.g., Wedding Portfolio" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="newAlbumDescription" placeholder="Optional description"></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="newAlbumNSFW">
+                        <label for="newAlbumNSFW">Mark this album as 18+ (NSFW)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dropzone" id="dropzone">
+            <div class="dropzone-icon">☁️</div>
+            <h3>Drop your images here</h3>
+            <p>or</p>
+            <button class="btn-browse" onclick="document.getElementById('fileInput').click()">
+                Browse Files
+            </button>
+            <input type="file" id="fileInput" multiple accept="image/*,video/*">
+        </div>
+
+        <div class="preview-grid" id="previewGrid"></div>
+
+        <div class="upload-btn-container">
+            <button class="btn-upload" id="uploadBtn" disabled>
+                Upload Photos
+            </button>
+        </div>
+
+        <div class="progress-container" id="progressContainer"></div>
+
+        <div class="success-message" id="successMessage">
+            ✓ All files uploaded successfully!
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION - PASTE YOUR CREDENTIALS HERE
+        // ============================================
+        
+        const CONFIG = {
+            // Bunny.net credentials
+            BUNNY_STORAGE_ZONE: 'arrow-hub',
+            BUNNY_STORAGE_PASSWORD: '058d97e0-f5e1-4d4f-b297408ce40f-cc41-42e1',
+            BUNNY_HOSTNAME: 'ny.storage.bunnycdn.com',
+            BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
+            
+            // Make.com webhooks
+            FETCH_ALBUMS_WEBHOOK: 'https://hook.eu2.make.com/rvc9yujsjcp1gf8l92pud560vta6r09e',
+            PROCESS_UPLOAD_WEBHOOK: 'https://hook.eu2.make.com/2e8de9m9c6w9e9dsp7hq9vxdtdtcckww'
+        };
+
+        // ============================================
+        // APPLICATION CODE
+        // ============================================
+
+        let selectedFiles = [];
+        let userEmail = null;
+        let userAlbums = [];
+        let newAlbumData = null;
+
+        function getUserEmail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('user_email');
+            
+            if (!email) {
+                showError('No user email provided. Please access this page from your profile.');
+                return null;
+            }
+            
+            return email;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+        }
+
+        async function fetchAlbums() {
+            try {
+                const response = await fetch(CONFIG.FETCH_ALBUMS_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_email: userEmail })
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch albums');
+
+                const data = await response.json();
+                userAlbums = Array.isArray(data) ? data : [];
+                
+                populateAlbumDropdown();
+            } catch (error) {
+                console.error('Error fetching albums:', error);
+                populateAlbumDropdown();
+            }
+        }
+
+        function populateAlbumDropdown() {
+            const select = document.getElementById('albumSelect');
+            select.innerHTML = '<option value="">Select an album...</option>';
+            
+            userAlbums.forEach(album => {
+                const option = document.createElement('option');
+                option.value = album.album_id;
+                option.textContent = album.album_title + (album.is_nsfw ? ' 🔞' : '');
+                select.appendChild(option);
+            });
+            
+            const newOption = document.createElement('option');
+            newOption.value = 'NEW';
+            newOption.textContent = '+ Create New Album';
+            select.appendChild(newOption);
+        }
+
+        document.getElementById('albumSelect').addEventListener('change', (e) => {
+            const newAlbumForm = document.getElementById('newAlbumForm');
+            if (e.target.value === 'NEW') {
+                newAlbumForm.classList.add('active');
+            } else {
+                newAlbumForm.classList.remove('active');
+            }
+        });
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const previewGrid = document.getElementById('previewGrid');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const successMessage = document.getElementById('successMessage');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        }, false);
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            const mediaFiles = files.filter(file => 
+                file.type.startsWith('image/') || file.type.startsWith('video/')
+            );
+            
+            mediaFiles.forEach(file => {
+                const fileObj = {
+                    file: file,
+                    id: Date.now() + Math.random(),
+                    is_nsfw: false,
+                    is_image: file.type.startsWith('image/'),
+                    is_video: file.type.startsWith('video/'),
+                    caption: ''
+                };
+                selectedFiles.push(fileObj);
+                createPreview(fileObj);
+            });
+
+            updateUploadButton();
+        }
+
+        function createPreview(fileObj) {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.dataset.id = fileObj.id;
+                
+                const mediaTag = fileObj.is_image ? 'img' : 'video';
+                
+                previewItem.innerHTML = `
+                    <${mediaTag} src="${e.target.result}" ${fileObj.is_video ? 'muted' : ''} alt="Preview"></${mediaTag}>
+                    <div class="preview-overlay">
+                        <div class="preview-controls">
+                            <label class="age-toggle">
+                                <input type="checkbox" class="toggle-checkbox" onchange="toggleNSFW(${fileObj.id}, this.checked)">
+                                <span>18+</span>
+                            </label>
+                            <button class="remove-btn" onclick="removeFile(${fileObj.id})">×</button>
+                        </div>
+                        <input type="text" class="caption-input" placeholder="Add caption (e.g. model name, location)" onchange="updateCaption(${fileObj.id}, this.value)">
+                    </div>
+                `;
+                
+                previewGrid.appendChild(previewItem);
+            };
+            
+            reader.readAsDataURL(fileObj.file);
+        }
+
+        window.toggleNSFW = function(fileId, checked) {
+            const fileObj = selectedFiles.find(f => f.id === fileId);
+            if (fileObj) {
+                fileObj.is_nsfw = checked;
+            }
+        };
+
+        window.updateCaption = function(fileId, caption) {
+            const fileObj = selectedFiles.find(f => f.id === fileId);
+            if (fileObj) {
+                fileObj.caption = caption;
+            }
+        };
+
+        window.removeFile = function(fileId) {
+            selectedFiles = selectedFiles.filter(f => f.id !== fileId);
+            const previewItem = document.querySelector(`[data-id="${fileId}"]`);
+            if (previewItem) {
+                previewItem.remove();
+            }
+            updateUploadButton();
+        };
+
+        function updateUploadButton() {
+            uploadBtn.disabled = selectedFiles.length === 0;
+            uploadBtn.textContent = selectedFiles.length > 0 
+                ? `Upload ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}`
+                : 'Upload Files';
+        }
+
+        uploadBtn.addEventListener('click', async () => {
+            const albumSelect = document.getElementById('albumSelect');
+            let albumId = albumSelect.value;
+            
+            if (!albumId) {
+                showError('Please select an album');
+                return;
+            }
+            
+            if (albumId === 'NEW') {
+                const title = document.getElementById('newAlbumTitle').value.trim();
+                if (!title) {
+                    showError('Please enter an album title');
+                    return;
+                }
+                
+                albumId = 'album_' + Date.now();
+                newAlbumData = {
+                    album_id: albumId,
+                    owner_email: userEmail,
+                    album_title: title,
+                    album_description: document.getElementById('newAlbumDescription').value.trim(),
+                    is_nsfw: document.getElementById('newAlbumNSFW').checked,
+                    created_at: new Date().toISOString(),
+                    album_status: 'active',
+                    privacy: 'public',
+                    is_featured: userAlbums.length === 0
+                };
+            }
+
+            uploadBtn.disabled = true;
+            progressContainer.classList.add('active');
+            progressContainer.innerHTML = '';
+            successMessage.classList.remove('active');
+
+            const uploadResults = [];
+
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const fileObj = selectedFiles[i];
+                
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.innerHTML = `
+                    <div class="progress-file-name">
+                        <span>${fileObj.file.name}</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                `;
+                progressContainer.appendChild(progressItem);
+
+                try {
+                    const result = await uploadToBunny(fileObj, albumId, progressItem);
+                    uploadResults.push(result);
+                } catch (error) {
+                    console.error('Upload failed:', error);
+                    showError(`Failed to upload ${fileObj.file.name}`);
+                }
+            }
+
+            await sendToMake(uploadResults, albumId);
+
+            successMessage.classList.add('active');
+            
+            setTimeout(() => {
+                selectedFiles = [];
+                previewGrid.innerHTML = '';
+                progressContainer.classList.remove('active');
+                updateUploadButton();
+                
+                if (newAlbumData) {
+                    userAlbums.push(newAlbumData);
+                    populateAlbumDropdown();
+                    newAlbumData = null;
+                }
+            }, 2000);
+        });
+
+        async function uploadToBunny(fileObj, albumId, progressItem) {
+            const fill = progressItem.querySelector('.progress-bar-fill');
+            const percent = progressItem.querySelector('.progress-file-name span:last-child');
+            
+            const fileName = `${Date.now()}_${fileObj.file.name}`;
+            const filePath = `/${userEmail}/${albumId}/${fileName}`;
+            
+            const url = `https://${CONFIG.BUNNY_HOSTNAME}/${CONFIG.BUNNY_STORAGE_ZONE}${filePath}`;
+            
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const progress = (e.loaded / e.total) * 100;
+                        fill.style.width = progress + '%';
+                        percent.textContent = Math.round(progress) + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 201) {
+                        const mediaUrl = `${CONFIG.BUNNY_CDN_URL}${filePath}`;
+                        const thumbUrl = fileObj.is_image 
+                            ? `${mediaUrl}?width=300&height=300` 
+                            : mediaUrl;
+                        
+                        resolve({
+                            media_id: 'media_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                            album_id: albumId,
+                            uploaded_by_email: userEmail,
+                            is_image: fileObj.is_image,
+                            is_video: fileObj.is_video,
+                            caption: fileObj.caption || '',
+                            media_url: mediaUrl,
+                            thumb_url: thumbUrl,
+                            is_nsfw: fileObj.is_nsfw,
+                            file_size_mb: (fileObj.file.size / 1024 / 1024).toFixed(2),
+                            uploaded_at: new Date().toISOString(),
+                            status: 'active'
+                        });
+                    } else {
+                        reject(new Error(`Upload failed: ${xhr.status}`));
+                    }
+                });
+                
+                xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+                
+                xhr.open('PUT', url);
+                xhr.setRequestHeader('AccessKey', CONFIG.BUNNY_STORAGE_PASSWORD);
+                xhr.send(fileObj.file);
+            });
+        }
+
+        async function sendToMake(uploadResults, albumId) {
+            try {
+                const payload = {
+                    user_email: userEmail,
+                    album_id: albumId,
+                    new_album: newAlbumData,
+                    media: uploadResults
+                };
+                
+                await fetch(CONFIG.PROCESS_UPLOAD_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (error) {
+                console.error('Failed to send data to Make.com:', error);
+            }
+        }
+
+        userEmail = getUserEmail();
+        if (userEmail) {
+            document.getElementById('userEmail').textContent = userEmail;
+            fetchAlbums();
+        }
+    </script>
+</body>
+</html>
