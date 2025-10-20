@@ -566,8 +566,22 @@
                 });
 
                 const data = await response.json();
-                userLimits = data.limits;
-                userStats = data.stats;
+                console.log('Received limits data:', data);
+                
+                // Webhook returns flat structure, so we split it
+                userLimits = {
+                    max_media: data.max_media,
+                    max_storage_gb: data.max_storage_gb,
+                    max_file_size_mb: data.max_file_size_mb
+                };
+                
+                userStats = {
+                    media_count: data.used_media,
+                    storage_used_gb: data.used_storage_gb
+                };
+
+                console.log('Parsed limits:', userLimits);
+                console.log('Parsed stats:', userStats);
 
                 updateUsageDisplay();
             } catch (error) {
@@ -594,8 +608,10 @@
             updateProgressBar('storageProgress', storagePct);
 
             document.getElementById('usageStats').classList.add('show');
-            document.getElementById('fileSizeLimit').textContent = 
-                `Max file size: ${userLimits.max_file_size_mb}MB`;
+            
+            // Update file size limit display
+            const maxFileSize = userLimits.max_file_size_mb || 50;
+            document.getElementById('fileSizeLimit').textContent = `Max file size: ${maxFileSize}MB`;
         }
 
         function updateProgressBar(id, percentage) {
