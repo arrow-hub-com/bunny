@@ -1036,7 +1036,7 @@
                     updateProgress(`Uploading ${i + 1} of ${selectedFiles.length}...`, 
                                  ((i / selectedFiles.length) * 100).toFixed(0));
 
-                    const fileName = `${Date.now()}_${fileObj.file.name}`;
+                    const fileName = `${Date.now() + i}_${fileObj.file.name}`;
                     const filePath = `/${userEmail}/${albumId}/${fileName}`;
 
                     await uploadToBunny(filePath, fileObj.file);
