@@ -688,9 +688,21 @@
 
                 const text = await response.text();
                 console.log('Album media response:', text);
+                console.log('Response type:', typeof text);
                 
-                currentAlbumMedia = text ? JSON.parse(text) : [];
-                console.log('Parsed album media:', currentAlbumMedia);
+                let parsedData;
+                try {
+                    parsedData = text ? JSON.parse(text) : [];
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    console.error('Failed to parse:', text);
+                    throw new Error('Invalid JSON response from webhook');
+                }
+                
+                console.log('Parsed album media:', parsedData);
+                console.log('Is array?', Array.isArray(parsedData));
+                
+                currentAlbumMedia = Array.isArray(parsedData) ? parsedData : [];
 
                 const grid = document.getElementById('albumViewGrid');
                 grid.innerHTML = '';
