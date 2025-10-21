@@ -1030,14 +1030,43 @@
                 }
 
                 // Upload files to Bunny
-                const uploadedMedia = [];
-                for (let i = 0; i < selectedFiles.length; i++) {
-                    const fileObj = selectedFiles[i];
-                    updateProgress(`Uploading ${i + 1} of ${selectedFiles.length}...`, 
-                                 ((i / selectedFiles.length) * 100).toFixed(0));
+              // Upload files to Bunny
+const uploadedMedia = [];
+for (let i = 0; i < selectedFiles.length; i++) {
+    const fileObj = selectedFiles[i];
+    console.log(`Processing file ${i}:`, fileObj.file.name, fileObj.file.size);
+    
+    updateProgress(`Uploading ${i + 1} of ${selectedFiles.length}...`, 
+                 ((i / selectedFiles.length) * 100).toFixed(0));
+    
+    const fileName = `${Date.now() + i}_${fileObj.file.name}`;
+    const filePath = `/${userEmail}/${albumId}/${fileName}`;
+    
+    console.log(`Uploading to path:`, filePath);
+    
+    await uploadToBunny(filePath, fileObj.file);
+    
+    console.log(`Uploaded successfully`);
+    
+    const mediaUrl = `${CONFIG.BUNNY_CDN_URL}${filePath}`;
+    const isImage = fileObj.file.type.startsWith('image/');
+    const isVideo = fileObj.file.type.startsWith('video/');
 
-                    const fileName = `${Date.now() + i}_${fileObj.file.name}`;
-                    const filePath = `/${userEmail}/${albumId}/${fileName}`;
+    uploadedMedia.push({
+        media_id: 'media_' + Date.now() + '_' + i,
+        album_id: albumId,
+        uploaded_by_email: userEmail,
+        is_image: isImage ? 'TRUE' : 'FALSE',
+        is_video: isVideo ? 'TRUE' : 'FALSE',
+        caption: fileObj.caption || '',
+        status: 'active',
+        media_url: mediaUrl,
+        thumb_url: mediaUrl,
+        uploaded_at: new Date().toISOString(),
+        is_nsfw: fileObj.isNsfw ? 'TRUE' : 'FALSE',
+        file_size_mb: (fileObj.file.size / 1024 / 1024).toFixed(2)
+    });
+}
 
                     await uploadToBunny(filePath, fileObj.file);
 
