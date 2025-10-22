@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrow Hub - Redirecting...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+        }
+        .error h1 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <div id="message">Redirecting to your gallery...</div>
+    </div>
 
+    <script>
+        // CSV URL for vanity URLs lookup
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2Gv5WO51aEI6VoZcceOIEZSImY6amOYJJ_7zKLOGACOUPNSaP9aZcjenjsohneOKSAtIelwRpQOm/pub?gid=1608551697&single=true&output=csv';
+
+        async function redirect() {
+            try {
+                // Get the display name from the URL path
+                const path = window.location.pathname;
+                const displayName = path.replace(/^\//, '').replace(/\/$/, '').toLowerCase();
+
+                console.log('Looking up:', displayName);
+
+                if (!displayName || displayName === '') {
+                    showError('No username provided', 'Please use a link like: go.arrow-hub.com/username');
+                    return;
+                }
+
+                // Fetch the CSV
+                const response = await fetch(CSV_URL);
+                const csvText = await response.text();
+
+                // Parse CSV
+                const lines = csvText.split('\n');
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                
+                console.log('CSV Headers:', headers);
+
+                // Find column indices
+                const displayNameIndex = headers.indexOf('display_name');
+                const urlIndex = headers.indexOf('full_vanity_url');
+
+                if (displayNameIndex === -1 || urlIndex === -1) {
+                    throw new Error('Invalid CSV structure');
+                }
+
+                // Search for matching display name
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    const columns = line.split(',');
+                    const csvDisplayName = columns[displayNameIndex]?.trim().toLowerCase();
+                    const targetUrl = columns[urlIndex]?.trim();
+
+                    console.log('Checking:', csvDisplayName, 'against', displayName);
+
+                    if (csvDisplayName === displayName) {
+                        console.log('Match found! Redirecting to:', targetUrl);
+                        // Redirect immediately
+                        window.location.href = targetUrl;
+                        return;
+                    }
+                }
+
+                // No match found
+                showError('Gallery Not Found', `No gallery found for username "${displayName}". Please check the link or contact the photographer.`);
+
+            } catch (error) {
+                console.error('Redirect error:', error);
+                showError('Something Went Wrong', 'Unable to load the gallery. Please try again later.');
+            }
+        }
+
+        function showError(title, message) {
+            document.querySelector('.container').innerHTML = `
+                <div class="error">
+                    <h1>${title}</h1>
+                    <p>${message}</p>
+                    <p style="margin-top: 20px;">
+                        <a href="https://arrow-hub.com">Visit Arrow Hub</a>
+                    </p>
+                </div>
+            `;
+        }
+
+        // Start redirect immediately
+        redirect();
+    </script>
+</body>
+</html>
