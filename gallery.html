@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v2.0</title>
+    <title>Arrow Hub - Gallery v3.0</title>
     <style>
         * {
             margin: 0;
@@ -65,9 +65,9 @@
 
         .grid {
             display: grid;
-            gap: 3px;
+            gap: 1px;
             margin-bottom: 40px;
-            background: #FFFFFF;
+            background: #000;
         }
 
         .grid-4 {
@@ -138,12 +138,12 @@
             pointer-events: none;
         }
 
-  .album-cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3px;
-    background: #ffffff;
-}
+        .album-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #000;
+        }
 
         @media (max-width: 768px) {
             .album-cards {
@@ -778,12 +778,15 @@
             setCookie('arrow_age_verified', 'true', 30);
             document.getElementById('ageVerification').classList.remove('show');
             
-            if (window.ageVerificationCallback) {
-                window.ageVerificationCallback();
-                window.ageVerificationCallback = null;
-            } else {
+            // Always reload to refresh all blur states
+            setTimeout(() => {
+                if (window.ageVerificationCallback) {
+                    window.ageVerificationCallback();
+                    window.ageVerificationCallback = null;
+                }
+                // Reload after callback completes
                 location.reload();
-            }
+            }, 100);
         }
 
         function declineAge() {
