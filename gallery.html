@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v9.0</title>
+    <title>Arrow Hub - Gallery v10.0</title>
     <style>
         * {
             margin: 0;
@@ -67,7 +67,7 @@
             display: grid;
             gap: 1px;
             margin-bottom: 40px;
-            background: #000;
+            background: #FFFF;
         }
 
         .grid-4 {
@@ -142,7 +142,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1px;
-            background: #000;
+            background: #FFFF;
         }
 
         @media (max-width: 768px) {
@@ -525,9 +525,9 @@
                 return;
             }
 
-            const cookieValue = getCookie('arrow_age_verified');
-            isOver18 = cookieValue === 'true';
-            console.log('Age verified cookie:', cookieValue);
+            const storedValue = localStorage.getItem('arrow_age_verified');
+            isOver18 = storedValue === 'true';
+            console.log('Age verified (localStorage):', storedValue);
             console.log('isOver18 set to:', isOver18);
 
             await loadGallery();
@@ -865,7 +865,10 @@
 
         function setCookie(name, value, days) {
             const expires = new Date(Date.now() + days * 864e5).toUTCString();
-            document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+            const cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+            document.cookie = cookie;
+            console.log('Cookie set:', cookie);
+            console.log('All cookies:', document.cookie);
         }
 
         function showEmptyState() {
