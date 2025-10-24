@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v10.0</title>
+    <title>Arrow Hub - Gallery v20.0</title>
     <style>
         * {
             margin: 0;
@@ -67,7 +67,7 @@
             display: grid;
             gap: 1px;
             margin-bottom: 40px;
-            background: #FFFF;
+            background: #000;
         }
 
         .grid-4 {
@@ -142,7 +142,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1px;
-            background: #FFFF;
+            background: #000;
         }
 
         @media (max-width: 768px) {
@@ -566,6 +566,8 @@
         }
 
         function renderGallery() {
+            console.log('renderGallery called, isOver18:', isOver18);
+            
             const featuredAlbum = albums.find(a => a.is_featured === 'TRUE');
             const otherAlbums = albums.filter(a => a.is_featured !== 'TRUE');
 
@@ -577,6 +579,8 @@
             }
 
             renderAlbumCards(otherAlbums);
+            
+            console.log('renderGallery complete');
         }
 
         async function renderPortfolio(album) {
@@ -782,10 +786,11 @@
 
         function confirmAge() {
             isOver18 = true;
-            setCookie('arrow_age_verified', 'true', 30);
+            localStorage.setItem('arrow_age_verified', 'true');
             document.getElementById('ageVerification').classList.remove('show');
             
             console.log('Age confirmed, isOver18 now:', isOver18);
+            console.log('localStorage set:', localStorage.getItem('arrow_age_verified'));
             
             // Execute callback if exists (opens lightbox)
             if (window.ageVerificationCallback) {
