@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v3.0</title>
+    <title>Arrow Hub - Gallery v4.0</title>
     <style>
         * {
             margin: 0;
@@ -67,8 +67,7 @@
             display: grid;
             gap: 1px;
             margin-bottom: 40px;
-            background: #FFFFFF 
-;
+            background: #000;
         }
 
         .grid-4 {
@@ -86,8 +85,7 @@
             aspect-ratio: 3/4;
             overflow: hidden;
             cursor: pointer;
-            background: #FFFFFF 
-;
+            background: #000;
         }
 
         .grid-item img {
@@ -144,8 +142,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1px;
-            background: ##FFFFFF 
-;
+            background: #000;
         }
 
         @media (max-width: 768px) {
@@ -170,8 +167,7 @@
             position: relative;
             aspect-ratio: 3/4;
             overflow: hidden;
-            background: ##FFFFFF 
-;
+            background: #000;
         }
 
         .album-card-cover img {
@@ -782,15 +778,15 @@
             setCookie('arrow_age_verified', 'true', 30);
             document.getElementById('ageVerification').classList.remove('show');
             
-            // Always reload to refresh all blur states
-            setTimeout(() => {
-                if (window.ageVerificationCallback) {
-                    window.ageVerificationCallback();
-                    window.ageVerificationCallback = null;
-                }
-                // Reload after callback completes
+            // Execute callback if exists (opens lightbox), then reload to update all blurs
+            if (window.ageVerificationCallback) {
+                window.ageVerificationCallback();
+                window.ageVerificationCallback = null;
+                // Give lightbox time to open, then reload will happen when they close it
+            } else {
+                // No callback, just reload the page
                 location.reload();
-            }, 100);
+            }
         }
 
         function declineAge() {
@@ -825,6 +821,13 @@
             const video = document.getElementById('lightboxVideo');
             video.pause();
             video.src = '';
+            
+            // If we just verified age, re-render the current view to remove blurs
+            if (isOver18 && currentAlbum) {
+                renderAlbumMedia(currentAlbum);
+            } else if (isOver18) {
+                renderGallery();
+            }
         }
 
         function nextMedia() {
