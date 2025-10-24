@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v5.0</title>
+    <title>Arrow Hub - Gallery v6.0</title>
     <style>
         * {
             margin: 0;
@@ -785,14 +785,21 @@
             setCookie('arrow_age_verified', 'true', 30);
             document.getElementById('ageVerification').classList.remove('show');
             
-            // Execute callback if exists (opens lightbox), then reload to update all blurs
+            console.log('Age confirmed, isOver18 now:', isOver18);
+            
+            // Execute callback if exists (opens lightbox)
             if (window.ageVerificationCallback) {
                 window.ageVerificationCallback();
                 window.ageVerificationCallback = null;
-                // Give lightbox time to open, then reload will happen when they close it
+            }
+            
+            // Re-render the gallery to remove all blurs
+            if (currentAlbum) {
+                // In album view
+                renderAlbumMedia(currentAlbum);
             } else {
-                // No callback, just reload the page
-                location.reload();
+                // In main gallery view
+                renderGallery();
             }
         }
 
