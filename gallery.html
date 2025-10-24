@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v4.0</title>
+    <title>Arrow Hub - Gallery v5.0</title>
     <style>
         * {
             margin: 0;
@@ -525,8 +525,10 @@
                 return;
             }
 
-            isOver18 = getCookie('arrow_age_verified') === 'true';
-            console.log('Age verified:', isOver18);
+            const cookieValue = getCookie('arrow_age_verified');
+            isOver18 = cookieValue === 'true';
+            console.log('Age verified cookie:', cookieValue);
+            console.log('isOver18 set to:', isOver18);
 
             await loadGallery();
         }
@@ -642,12 +644,17 @@
             }
 
             albumsList.forEach(album => {
+                console.log('Rendering album:', album.album_title, 'is_nsfw:', album.is_nsfw, 'isOver18:', isOver18);
+                
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.onclick = () => openAlbum(album);
 
                 const isNSFW = album.is_nsfw === 'TRUE';
                 const needsBlur = isNSFW && !isOver18;
+                
+                console.log('needsBlur:', needsBlur);
+                
                 const coverUrl = album.cover_url || '';
                 const imageCount = parseInt(album.image_count) || 0;
                 const videoCount = parseInt(album.video_count) || 0;
