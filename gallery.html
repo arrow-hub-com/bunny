@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v21.7</title>
+    <title>Arrow Hub - Gallery v22.0</title>
     <style>
         * {
             margin: 0;
@@ -67,7 +67,7 @@
             display: grid;
             gap: 1px;
             margin-bottom: 40px;
-            background: #FFFFFF;
+            background: #000;
         }
 
         .grid-4 {
@@ -85,7 +85,7 @@
             aspect-ratio: 3/4;
             overflow: hidden;
             cursor: pointer;
-            background: #FFFFFF;
+            background: #000;
         }
 
         .grid-item img {
@@ -138,22 +138,25 @@
             pointer-events: none;
         }
 
-   .album-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
-       justify-content: flex-start;
-    background: transparent;
-}
-        
-.album-card {
-    min-width: 150px;
-    max-width: 200px;
-    background: white;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
+        .album-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #000;
+        }
+
+        @media (max-width: 768px) {
+            .album-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .album-card {
+            background: white;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
 
         .album-card:hover {
             transform: translateY(-4px);
@@ -346,6 +349,25 @@
             z-index: 10001;
         }
 
+        .lightbox-report {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            z-index: 10001;
+            transition: background 0.2s;
+        }
+
+        .lightbox-report:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
         .lightbox-nav {
             position: absolute;
             top: 50%;
@@ -480,6 +502,7 @@
 
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" onclick="closeLightbox()">×</button>
+        <button class="lightbox-report" onclick="reportImage()">⚠️ Report</button>
         <button class="lightbox-nav lightbox-prev" onclick="prevMedia()">‹</button>
         <button class="lightbox-nav lightbox-next" onclick="nextMedia()">›</button>
         <div class="lightbox-content">
@@ -685,6 +708,9 @@
                 return;
             }
 
+            currentAlbum = album;
+            console.log('Opening album, currentAlbum set to:', currentAlbum);
+            
             document.getElementById('portfolioView').classList.add('hidden');
             document.getElementById('albumView').classList.remove('hidden');
             document.getElementById('backButton').classList.add('show');
@@ -769,6 +795,8 @@
 
         document.getElementById('backButton').onclick = (e) => {
             e.preventDefault();
+            currentAlbum = null;
+            console.log('Back button clicked, currentAlbum set to null');
             displayedMediaCount = 0;
             document.getElementById('albumView').classList.add('hidden');
             document.getElementById('portfolioView').classList.remove('hidden');
@@ -856,6 +884,12 @@
             if (currentMediaIndex > 0) {
                 openLightbox(currentAlbumMedia, currentMediaIndex - 1);
             }
+        }
+
+        function reportImage() {
+            const media = currentAlbumMedia[currentMediaIndex];
+            const reportUrl = `https://arrow-hub.com/dl/8ad30d?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
+            window.open(reportUrl, '_blank');
         }
 
         function getCookie(name) {
