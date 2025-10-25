@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v22.0</title>
+    <title>Arrow Hub - Gallery v23.0</title>
     <style>
         * {
             margin: 0;
@@ -513,13 +513,12 @@
     </div>
 
     <script>
-        // Gallery Version 2.0 - Fresh rebuild
-        console.log('Arrow Hub Gallery v2.0');
+        // Gallery Version 2.1 - JSON file based (no webhooks)
+        console.log('Arrow Hub Gallery v2.1 - JSON');
         
         const CONFIG = {
             BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
-            FETCH_ALBUMS_WEBHOOK: 'https://hook.eu2.make.com/rvc9yujsjcp1gf8l92pud560vta6r09e',
-            GET_ALBUM_MEDIA_WEBHOOK: 'https://hook.eu2.make.com/7mcus9wexaivddwnln1vle7cpiqs26ga'
+            BUNNY_STORAGE_URL: 'https://ny.storage.bunnycdn.com/arrow-hub'
         };
 
         let userEmail = '';
@@ -888,7 +887,7 @@
 
         function reportImage() {
             const media = currentAlbumMedia[currentMediaIndex];
-            const reportUrl = `https://arrow-hub.com/dl/f2f9fa?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&account=${userEmail}`;
+            const reportUrl = `https://arrow-hub.com/dl/8ad30d?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
             window.open(reportUrl, '_blank');
         }
 
