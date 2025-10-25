@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v21.3</title>
+    <title>Arrow Hub - Gallery v21.4</title>
     <style>
         * {
             margin: 0;
@@ -142,6 +142,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 3px;
+       justify-content: flex-start;
     background: transparent;
 }
         @media (max-width: 768px) {
@@ -149,9 +150,10 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-
-       .album-card {
+.album-card {
     width: calc(33.333% - 2px);
+    min-width: 250px;
+    max-width: 350px;
     background: white;
     overflow: hidden;
     cursor: pointer;
