@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v21.2</title>
+    <title>Arrow Hub - Gallery v21.3</title>
     <style>
         * {
             margin: 0;
@@ -138,25 +138,25 @@
             pointer-events: none;
         }
 
-        .album-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+   .album-cards {
+    display: flex;
+    flex-wrap: wrap;
     gap: 3px;
     background: transparent;
 }
-
         @media (max-width: 768px) {
             .album-cards {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        .album-card {
-            background: white;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+       .album-card {
+    width: calc(33.333% - 2px);
+    background: white;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
 
         .album-card:hover {
             transform: translateY(-4px);
