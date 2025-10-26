@@ -530,7 +530,7 @@
                 const encodedEmail = encodeURIComponent(userEmail);
                 
                 // Fetch from Bunny CDN with cache buster
-                const response = await fetch(`https://arrow-hub.b-cdn.net/${encodedEmail}/gallery-data.json?v=${Date.now()}`);
+                const response = await fetch(`https://ny.storage.bunnycdn.com/arrow-hub/${encodedEmail}/gallery-data.json?v=${Date.now()}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
