@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.1</title>
+    <title>Arrow Hub - Gallery v23.2</title>
     <style>
         * {
             margin: 0;
@@ -530,7 +530,7 @@
                 const encodedEmail = encodeURIComponent(userEmail);
                 
                 // Fetch from Bunny CDN with cache buster
-               const response = await fetch(`https://arrow-hub.b-cdn.net/${encodedEmail}/gallery-data.json?v=${Date.now()}`);
+                const response = await fetch(`https://arrow-hub.b-cdn.net/${encodedEmail}/gallery-data.json?v=${Date.now()}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -561,20 +561,12 @@
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('portfolioContent').classList.remove('hidden');
 
-            // Render portfolio (featured media from all albums)
+            // Render portfolio (featured media from flat media array)
             const portfolioGrid = document.getElementById('portfolioGrid');
             portfolioGrid.innerHTML = '';
             
-            let portfolioMedia = [];
-            galleryData.albums.forEach(album => {
-                if (album.media && album.media.length > 0) {
-                    // Add up to 4 media items from each album to portfolio
-                    portfolioMedia.push(...album.media.slice(0, 4));
-                }
-            });
-
-            // Limit portfolio to 20 items
-            portfolioMedia = portfolioMedia.slice(0, 20);
+            // Use the flat media array, limit to 20 items
+            const portfolioMedia = galleryData.media ? galleryData.media.slice(0, 20) : [];
 
             portfolioMedia.forEach((item, index) => {
                 const isNSFW = item.is_nsfw === 'TRUE' || item.is_nsfw === true;
@@ -585,9 +577,9 @@
                 gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
                 gridItem.onclick = () => {
                     if (needsBlur) {
-                        showAgeVerification(() => openLightbox(portfolioMedia, index));
+                        showAgeVerification(() => openLightbox(galleryData.media, galleryData.media.indexOf(item)));
                     } else {
-                        openLightbox(portfolioMedia, index);
+                        openLightbox(galleryData.media, galleryData.media.indexOf(item));
                     }
                 };
 
@@ -612,7 +604,8 @@
                 const isNSFW = album.is_nsfw === 'TRUE' || album.is_nsfw === true;
                 const needsBlur = isNSFW && !isOver18;
                 const coverUrl = album.cover_url;
-                const mediaCount = album.media ? album.media.length : 0;
+                // Count media items from flat array by filtering by album_id
+                const mediaCount = galleryData.media ? galleryData.media.filter(m => m.album_id === album.album_id).length : 0;
 
                 const card = document.createElement('div');
                 card.className = 'album-card';
@@ -643,7 +636,9 @@
             }
 
             currentAlbum = album;
-            currentAlbumMedia = album.media || [];
+            
+            // Filter media from the flat media array by album_id
+            currentAlbumMedia = galleryData.media.filter(m => m.album_id === album.album_id);
             displayedMediaCount = 0;
             
             console.log('Opening album:', currentAlbum.album_title, 'with', currentAlbumMedia.length, 'items');
