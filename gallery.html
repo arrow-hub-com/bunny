@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.6</title>
+    <title>Arrow Hub - Gallery v23.7</title>
     <style>
         * {
             margin: 0;
@@ -602,10 +602,23 @@
         function renderGallery() {
             console.log('renderGallery called, isOver18:', isOver18);
             console.log('Albums array:', albums);
-            console.log('All media array:', allMedia);
             
-            const featuredAlbum = albums.find(a => a.is_featured === 'TRUE' || a.is_featured === true);
-            const otherAlbums = albums.filter(a => a.is_featured !== 'TRUE' && a.is_featured !== true);
+            // Log each album's is_featured value to debug
+            albums.forEach(a => {
+                console.log(`Album "${a.album_title}" - is_featured value:`, a.is_featured, 'type:', typeof a.is_featured);
+            });
+            
+            // Check for featured album - handle multiple boolean formats
+            const featuredAlbum = albums.find(a => {
+                const featured = String(a.is_featured || '').trim().toUpperCase();
+                console.log(`Checking album "${a.album_title}" - featured value after trim: "${featured}"`);
+                return featured === 'TRUE' || featured === '1';
+            });
+            
+            const otherAlbums = albums.filter(a => {
+                const featured = String(a.is_featured || '').trim().toUpperCase();
+                return featured !== 'TRUE' && featured !== '1';
+            });
             
             console.log('Featured album:', featuredAlbum);
             console.log('Other albums:', otherAlbums.length);
