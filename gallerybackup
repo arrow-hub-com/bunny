@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrow Hub - Gallery v23.9</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-button {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            color: #262626;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .back-button:hover {
+            background: #fafafa;
+        }
+
+        .back-button.show {
+            display: inline-flex;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #262626;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .portfolio-section {
+            margin-bottom: 60px;
+        }
+
+        .albums-section {
+            margin-bottom: 40px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 3px;
+            margin-bottom: 40px;
+            background: #FFFFFF;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        @media (max-width: 768px) {
+            .grid-3, .grid-4 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .grid-item {
+            position: relative;
+            aspect-ratio: 1/1;  /* Square for Instagram style */
+            overflow: hidden;
+            cursor: pointer;
+            background: #FFFFFF;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .grid-item.blurred img {
+            filter: blur(20px);
+        }
+
+        .grid-item .blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+        }
+
+        .grid-item.blurred .blur-overlay {
+            display: flex;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5em;
+            pointer-events: none;
+        }
+
+       .album-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+            background: #FFFFFF;
+        }
+
+        @media (max-width: 768px) {
+            .album-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .album-card {
+            background: white;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .album-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .album-card-cover {
+            position: relative;
+            aspect-ratio: 1/1;  /* Square thumbnails */
+            overflow: hidden;
+            background: #000;
+        }
+
+        .album-card-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .album-card-cover.blurred img {
+            filter: blur(20px);
+        }
+
+        .album-card-cover .nsfw-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .album-card-info {
+            padding: 12px;
+            background: white;
+        }
+
+        .album-card-title {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .album-card-description {
+            font-size: 0.85em;
+            color: #8e8e8e;
+            margin-bottom: 5px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .album-card-count {
+            font-size: 0.8em;
+            color: #8e8e8e;
+        }
+
+        .age-verification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .age-verification.show {
+            display: flex;
+        }
+
+        .age-verification-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .age-verification-content h2 {
+            margin-bottom: 20px;
+            color: #262626;
+        }
+
+        .age-verification-content p {
+            margin-bottom: 30px;
+            color: #8e8e8e;
+            line-height: 1.6;
+        }
+
+        .age-verification-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .age-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .age-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .age-btn-yes {
+            background: #0095f6;
+            color: white;
+        }
+
+        .age-btn-no {
+            background: #efefef;
+            color: #262626;
+        }
+
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .lightbox.show {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lightbox-media {
+            max-width: 90vw;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .lightbox-video {
+            max-width: 90vw;
+            max-height: 80vh;
+        }
+
+        .lightbox-caption {
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10001;
+        }
+
+        .lightbox-report {
+            display: block;
+            margin: 10px auto 0 auto;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .lightbox-report:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .lightbox-prev {
+            left: 20px;
+        }
+
+        .lightbox-next {
+            right: 20px;
+        }
+
+        .load-more {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: block;
+        }
+
+        .load-more:hover {
+            background: #fafafa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8e8e8e;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0095f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8e8e8e;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Loading gallery...</div>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <a href="#" class="back-button" id="backButton">
+                ← Back to Gallery
+            </a>
+
+            <div id="portfolioView">
+                <div class="portfolio-section" id="portfolioSection">
+                    <h2 class="section-title">Portfolio</h2>
+                    <div class="grid grid-3" id="portfolioGrid"></div>
+                </div>
+
+                <div class="albums-section">
+                    <h2 class="section-title">Albums</h2>
+                    <div class="album-cards" id="albumCards"></div>
+                </div>
+            </div>
+
+            <div id="albumView" class="hidden">
+                <h2 class="section-title" id="albumViewTitle"></h2>
+                <div class="grid grid-4" id="albumViewGrid"></div>
+                <button class="load-more hidden" id="loadMoreBtn" onclick="loadMoreMedia()">Load More</button>
+            </div>
+
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">📸</div>
+                <div>No photos yet</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="age-verification" id="ageVerification">
+        <div class="age-verification-content">
+            <h2>🔞 Age Verification</h2>
+            <p>This content may contain artistic nudity and mature themes. You must be 18 or older to view.</p>
+            <div class="age-verification-buttons">
+                <button class="age-btn age-btn-no" onclick="declineAge()">I'm under 18</button>
+                <button class="age-btn age-btn-yes" onclick="confirmAge()">I'm 18+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">×</button>
+        <button class="lightbox-nav lightbox-prev" onclick="prevMedia()">‹</button>
+        <button class="lightbox-nav lightbox-next" onclick="nextMedia()">›</button>
+        <div class="lightbox-content">
+            <img class="lightbox-media hidden" id="lightboxImage">
+            <video class="lightbox-video hidden" id="lightboxVideo" controls></video>
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+            <button class="lightbox-report" onclick="reportImage()">⚠️ Report</button>
+        </div>
+    </div>
+
+    <script>
+        // Gallery Version 2.1 - JSON file based (no webhooks)
+        console.log('Arrow Hub Gallery v2.1 - JSON');
+        
+        const CONFIG = {
+            BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
+            BUNNY_STORAGE_URL: 'https://ny.storage.bunnycdn.com/arrow-hub'
+        };
+
+        let userEmail = '';
+        let albums = [];
+        let allMedia = [];
+        let currentAlbumMedia = [];
+        let displayedMediaCount = 0;
+        const MEDIA_PER_PAGE = 24;
+        let currentMediaIndex = 0;
+        let isOver18 = false;
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            console.log('Gallery init started');
+            
+            const params = new URLSearchParams(window.location.search);
+            userEmail = params.get('user_email') || 'arrowphtosuk@gmail.com';
+            
+            console.log('User email:', userEmail);
+
+            if (!userEmail) {
+                showError('No user profile specified');
+                return;
+            }
+
+            const storedValue = localStorage.getItem('arrow_age_verified');
+            isOver18 = storedValue === 'true';
+            console.log('Age verified (localStorage):', storedValue);
+            console.log('isOver18 set to:', isOver18);
+
+            await loadGallery();
+        }
+
+        async function loadGallery() {
+            try {
+                console.log('loadGallery started');
+                
+                // Fetch the gallery JSON file from CDN
+                // Add timestamp to bust cache
+                const timestamp = new Date().getTime();
+                const jsonUrl = `${CONFIG.BUNNY_CDN_URL}/${userEmail}/gallery-data.json?v=${timestamp}`;
+                console.log('Fetching JSON from:', jsonUrl);
+                
+                const response = await fetch(jsonUrl, {
+                    cache: 'no-store'
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        console.log('No gallery data found (404)');
+                        showEmptyState();
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Gallery data loaded:', data);
+                
+                albums = data.albums || [];
+                allMedia = data.media || [];
+                
+                console.log('Parsed albums:', albums.length);
+                console.log('Parsed media:', allMedia.length);
+
+                if (albums.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+
+                renderGallery();
+
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading gallery:', error);
+                showError('Could not load gallery');
+            }
+        }
+
+        function renderGallery() {
+            console.log('renderGallery called, isOver18:', isOver18);
+            console.log('Albums array:', albums);
+            
+            // Log each album's is_featured value to debug
+            albums.forEach(a => {
+                console.log(`Album "${a.album_title}" - is_featured value:`, a.is_featured, 'type:', typeof a.is_featured);
+            });
+            
+            // Check for featured album - handle multiple boolean formats
+            const featuredAlbum = albums.find(a => {
+                const featured = String(a.is_featured || '').trim().toUpperCase();
+                console.log(`Checking album "${a.album_title}" - featured value after trim: "${featured}"`);
+                return featured === 'TRUE' || featured === '1';
+            });
+            
+            const otherAlbums = albums.filter(a => {
+                const featured = String(a.is_featured || '').trim().toUpperCase();
+                return featured !== 'TRUE' && featured !== '1';
+            });
+            
+            console.log('Featured album:', featuredAlbum);
+            console.log('Other albums:', otherAlbums.length);
+
+            // TEMPORARY: Use first album as portfolio if no featured album found
+            const portfolioAlbum = featuredAlbum || albums[0];
+            console.log('Portfolio album (featured or first):', portfolioAlbum);
+
+            if (portfolioAlbum) {
+                renderPortfolio(portfolioAlbum);
+                document.getElementById('portfolioSection').classList.remove('hidden');
+            } else {
+                console.log('No albums at all!');
+                document.getElementById('portfolioSection').classList.add('hidden');
+            }
+
+            // Only show non-portfolio albums in album cards
+            const albumsToShow = featuredAlbum ? otherAlbums : albums.slice(1);
+            renderAlbumCards(albumsToShow);
+            
+            console.log('renderGallery complete');
+        }
+
+        function renderPortfolio(album) {
+            console.log('Loading portfolio for album:', album.album_id);
+            
+            // Filter media from the already-loaded allMedia array
+            const albumMedia = allMedia.filter(m => m.album_id === album.album_id);
+            console.log('Portfolio media found:', albumMedia.length);
+
+            const portfolioMedia = albumMedia.slice(0, 20); // Show max 20 images
+
+            const grid = document.getElementById('portfolioGrid');
+            grid.innerHTML = '';
+
+            if (portfolioMedia.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><p>No media in portfolio album</p></div>';
+                return;
+            }
+
+            portfolioMedia.forEach((item, index) => {
+                const isNSFW = item.is_nsfw === 'TRUE';
+                const needsBlur = isNSFW && !isOver18;
+                const isVideo = item.is_video === 'TRUE';
+
+                const gridItem = document.createElement('div');
+                gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
+                gridItem.onclick = () => {
+                    if (needsBlur) {
+                        showAgeVerification(() => openLightbox(portfolioMedia, index));
+                    } else {
+                        openLightbox(portfolioMedia, index);
+                    }
+                };
+
+                gridItem.innerHTML = `
+                    <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
+                    ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
+                    ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
+                `;
+
+                grid.appendChild(gridItem);
+            });
+        }
+
+        function renderAlbumCards(albumsList) {
+            const container = document.getElementById('albumCards');
+            container.innerHTML = '';
+
+            if (albumsList.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No albums yet</p></div>';
+                return;
+            }
+
+            albumsList.forEach(album => {
+                console.log('Rendering album:', album.album_title, 'is_nsfw:', album.is_nsfw, 'isOver18:', isOver18);
+                
+                const card = document.createElement('div');
+                card.className = 'album-card';
+                card.onclick = () => openAlbum(album);
+
+                const isNSFW = album.is_nsfw === 'TRUE';
+                const needsBlur = isNSFW && !isOver18;
+                
+                console.log('needsBlur:', needsBlur);
+                
+                const coverUrl = album.cover_url || '';
+                const imageCount = parseInt(album.image_count) || 0;
+                const videoCount = parseInt(album.video_count) || 0;
+                const totalCount = imageCount + videoCount;
+
+                card.innerHTML = `
+                    <div class="album-card-cover ${needsBlur ? 'blurred' : ''}">
+                        ${coverUrl ? `<img src="${coverUrl}?width=400" alt="${album.album_title}" loading="lazy">` : '<div style="background:#e0e0e0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#999;">No Cover</div>'}
+                        ${isNSFW ? '<div class="nsfw-badge">18+</div>' : ''}
+                    </div>
+                    <div class="album-card-info">
+                        <div class="album-card-title">${album.album_title}</div>
+                        <div class="album-card-description">${album.album_description || ''}</div>
+                        <div class="album-card-count">${totalCount} items</div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        async function openAlbum(album) {
+            const isNSFW = album.is_nsfw === 'TRUE';
+            
+            if (isNSFW && !isOver18) {
+                showAgeVerification(() => openAlbum(album));
+                return;
+            }
+
+            currentAlbum = album;
+            console.log('Opening album, currentAlbum set to:', currentAlbum);
+            
+            document.getElementById('portfolioView').classList.add('hidden');
+            document.getElementById('albumView').classList.remove('hidden');
+            document.getElementById('backButton').classList.add('show');
+            document.getElementById('albumViewTitle').textContent = album.album_title;
+
+            renderAlbumMedia(album);
+        }
+
+        function renderAlbumMedia(album) {
+            console.log('Loading media for album:', album.album_id);
+            
+            // Filter media from the already-loaded allMedia array
+            currentAlbumMedia = allMedia.filter(m => m.album_id === album.album_id);
+            console.log('Album media found:', currentAlbumMedia.length);
+            
+            displayedMediaCount = 0;
+
+            const grid = document.getElementById('albumViewGrid');
+            grid.innerHTML = '';
+
+            if (currentAlbumMedia.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><p>No media in this album</p></div>';
+                document.getElementById('loadMoreBtn').classList.add('hidden');
+                return;
+            }
+
+            loadMoreMedia();
+        }
+
+        function loadMoreMedia() {
+            const grid = document.getElementById('albumViewGrid');
+            const startIndex = displayedMediaCount;
+            const endIndex = Math.min(startIndex + MEDIA_PER_PAGE, currentAlbumMedia.length);
+
+            for (let i = startIndex; i < endIndex; i++) {
+                const item = currentAlbumMedia[i];
+                const isNSFW = item.is_nsfw === 'TRUE';
+                const needsBlur = isNSFW && !isOver18;
+                const isVideo = item.is_video === 'TRUE';
+
+                const gridItem = document.createElement('div');
+                gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
+                gridItem.onclick = () => {
+                    if (needsBlur) {
+                        showAgeVerification(() => openLightbox(currentAlbumMedia, i));
+                    } else {
+                        openLightbox(currentAlbumMedia, i);
+                    }
+                };
+
+                gridItem.innerHTML = `
+                    <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
+                    ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
+                    ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
+                `;
+
+                grid.appendChild(gridItem);
+            }
+
+            displayedMediaCount = endIndex;
+
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (displayedMediaCount >= currentAlbumMedia.length) {
+                loadMoreBtn.classList.add('hidden');
+            } else {
+                loadMoreBtn.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('backButton').onclick = (e) => {
+            e.preventDefault();
+            currentAlbum = null;
+            console.log('Back button clicked, currentAlbum set to null');
+            displayedMediaCount = 0;
+            document.getElementById('albumView').classList.add('hidden');
+            document.getElementById('portfolioView').classList.remove('hidden');
+            document.getElementById('backButton').classList.remove('show');
+            document.getElementById('loadMoreBtn').classList.add('hidden');
+        };
+
+        function showAgeVerification(callback) {
+            document.getElementById('ageVerification').classList.add('show');
+            window.ageVerificationCallback = callback;
+        }
+
+        function confirmAge() {
+            isOver18 = true;
+            localStorage.setItem('arrow_age_verified', 'true');
+            document.getElementById('ageVerification').classList.remove('show');
+            
+            console.log('Age confirmed, isOver18 now:', isOver18);
+            console.log('localStorage set:', localStorage.getItem('arrow_age_verified'));
+            
+            // Execute callback if exists (opens lightbox)
+            if (window.ageVerificationCallback) {
+                window.ageVerificationCallback();
+                window.ageVerificationCallback = null;
+            }
+            
+            // Re-render the gallery to remove all blurs
+            if (currentAlbum) {
+                // In album view
+                renderAlbumMedia(currentAlbum);
+            } else {
+                // In main gallery view
+                renderGallery();
+            }
+        }
+
+        function declineAge() {
+            document.getElementById('ageVerification').classList.remove('show');
+            alert('You must be 18 or older to view this content.');
+        }
+
+        function openLightbox(mediaList, index) {
+            currentMediaIndex = index;
+            currentAlbumMedia = mediaList;
+            const media = mediaList[index];
+            
+            document.getElementById('lightbox').classList.add('show');
+            document.getElementById('lightboxCaption').textContent = media.caption || '';
+
+            if (media.is_video === 'TRUE') {
+                document.getElementById('lightboxImage').classList.add('hidden');
+                const video = document.getElementById('lightboxVideo');
+                video.src = media.media_url;
+                video.classList.remove('hidden');
+                video.load();
+            } else {
+                document.getElementById('lightboxVideo').classList.add('hidden');
+                const img = document.getElementById('lightboxImage');
+                img.src = media.media_url;
+                img.classList.remove('hidden');
+            }
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('show');
+            const video = document.getElementById('lightboxVideo');
+            video.pause();
+            video.src = '';
+            
+            // If we just verified age, re-render the current view to remove blurs
+            if (isOver18 && currentAlbum) {
+                renderAlbumMedia(currentAlbum);
+            } else if (isOver18) {
+                renderGallery();
+            }
+        }
+
+        function nextMedia() {
+            if (currentMediaIndex < currentAlbumMedia.length - 1) {
+                openLightbox(currentAlbumMedia, currentMediaIndex + 1);
+            }
+        }
+
+        function prevMedia() {
+            if (currentMediaIndex > 0) {
+                openLightbox(currentAlbumMedia, currentMediaIndex - 1);
+            }
+        }
+
+        function reportImage() {
+            const media = currentAlbumMedia[currentMediaIndex];
+              const mediaId = media.media_id;  // Extracting the media ID
+            const reportUrl = `https://arrow-hub.com/dl/f2f9fa?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
+            window.open(reportUrl, '_blank');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function setCookie(name, value, days) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            const cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+            document.cookie = cookie;
+            console.log('Cookie set:', cookie);
+            console.log('All cookies:', document.cookie);
+        }
+
+        function showEmptyState() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+        }
+
+        function showError(message) {
+            document.getElementById('loading').innerHTML = `
+                <div class="empty-state-icon">⚠️</div>
+                <div>${message}</div>
+            `;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('lightbox').classList.contains('show')) return;
+            
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') prevMedia();
+            if (e.key === 'ArrowRight') nextMedia();
+        });
+    </script>
+</body>
+</html>
