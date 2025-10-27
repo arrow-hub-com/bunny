@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.7</title>
+    <title>Arrow Hub - Gallery v23.8</title>
     <style>
         * {
             margin: 0;
@@ -560,10 +560,14 @@
                 console.log('loadGallery started');
                 
                 // Fetch the gallery JSON file from CDN
-                const jsonUrl = `${CONFIG.BUNNY_CDN_URL}/${userEmail}/gallery-data.json`;
+                // Add timestamp to bust cache
+                const timestamp = new Date().getTime();
+                const jsonUrl = `${CONFIG.BUNNY_CDN_URL}/${userEmail}/gallery-data.json?v=${timestamp}`;
                 console.log('Fetching JSON from:', jsonUrl);
                 
-                const response = await fetch(jsonUrl);
+                const response = await fetch(jsonUrl, {
+                    cache: 'no-store'
+                });
                 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -623,15 +627,21 @@
             console.log('Featured album:', featuredAlbum);
             console.log('Other albums:', otherAlbums.length);
 
-            if (featuredAlbum) {
-                renderPortfolio(featuredAlbum);
+            // TEMPORARY: Use first album as portfolio if no featured album found
+            const portfolioAlbum = featuredAlbum || albums[0];
+            console.log('Portfolio album (featured or first):', portfolioAlbum);
+
+            if (portfolioAlbum) {
+                renderPortfolio(portfolioAlbum);
                 document.getElementById('portfolioSection').classList.remove('hidden');
             } else {
-                console.log('No featured album found');
+                console.log('No albums at all!');
                 document.getElementById('portfolioSection').classList.add('hidden');
             }
 
-            renderAlbumCards(otherAlbums);
+            // Only show non-portfolio albums in album cards
+            const albumsToShow = featuredAlbum ? otherAlbums : albums.slice(1);
+            renderAlbumCards(albumsToShow);
             
             console.log('renderGallery complete');
         }
