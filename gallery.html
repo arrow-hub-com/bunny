@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.5</title>
+    <title>Arrow Hub - Gallery v23.6</title>
     <style>
         * {
             margin: 0;
@@ -601,14 +601,20 @@
 
         function renderGallery() {
             console.log('renderGallery called, isOver18:', isOver18);
+            console.log('Albums array:', albums);
+            console.log('All media array:', allMedia);
             
-            const featuredAlbum = albums.find(a => a.is_featured === 'TRUE');
-            const otherAlbums = albums.filter(a => a.is_featured !== 'TRUE');
+            const featuredAlbum = albums.find(a => a.is_featured === 'TRUE' || a.is_featured === true);
+            const otherAlbums = albums.filter(a => a.is_featured !== 'TRUE' && a.is_featured !== true);
+            
+            console.log('Featured album:', featuredAlbum);
+            console.log('Other albums:', otherAlbums.length);
 
             if (featuredAlbum) {
                 renderPortfolio(featuredAlbum);
                 document.getElementById('portfolioSection').classList.remove('hidden');
             } else {
+                console.log('No featured album found');
                 document.getElementById('portfolioSection').classList.add('hidden');
             }
 
@@ -717,41 +723,28 @@
             document.getElementById('backButton').classList.add('show');
             document.getElementById('albumViewTitle').textContent = album.album_title;
 
-            await renderAlbumMedia(album);
+            renderAlbumMedia(album);
         }
 
-        async function renderAlbumMedia(album) {
-            try {
-                console.log('Loading media for album:', album.album_id);
-                
-                const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ album_id: album.album_id })
-                });
+        function renderAlbumMedia(album) {
+            console.log('Loading media for album:', album.album_id);
+            
+            // Filter media from the already-loaded allMedia array
+            currentAlbumMedia = allMedia.filter(m => m.album_id === album.album_id);
+            console.log('Album media found:', currentAlbumMedia.length);
+            
+            displayedMediaCount = 0;
 
-                const text = await response.text();
-                console.log('Album media response:', text);
-                
-                currentAlbumMedia = text ? JSON.parse(text) : [];
-                console.log('Parsed album media:', currentAlbumMedia);
-                displayedMediaCount = 0;
+            const grid = document.getElementById('albumViewGrid');
+            grid.innerHTML = '';
 
-                const grid = document.getElementById('albumViewGrid');
-                grid.innerHTML = '';
-
-                if (currentAlbumMedia.length === 0) {
-                    grid.innerHTML = '<div class="empty-state"><p>No media in this album</p></div>';
-                    document.getElementById('loadMoreBtn').classList.add('hidden');
-                    return;
-                }
-
-                loadMoreMedia();
-
-            } catch (error) {
-                console.error('Error loading album media:', error);
-                document.getElementById('albumViewGrid').innerHTML = '<div class="empty-state"><p>Could not load album</p></div>';
+            if (currentAlbumMedia.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><p>No media in this album</p></div>';
+                document.getElementById('loadMoreBtn').classList.add('hidden');
+                return;
             }
+
+            loadMoreMedia();
         }
 
         function loadMoreMedia() {
