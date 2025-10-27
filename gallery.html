@@ -905,6 +905,7 @@
 
         function reportImage() {
             const media = currentAlbumMedia[currentMediaIndex];
+              const mediaId = media.media_id;  // Extracting the media ID
             const reportUrl = `https://arrow-hub.com/dl/f2f9fa?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
             window.open(reportUrl, '_blank');
         }
