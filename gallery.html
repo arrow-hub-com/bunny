@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.9</title>
+    <title>Arrow Hub - Gallery v24.o</title>
     <style>
         * {
             margin: 0;
@@ -293,6 +293,109 @@
             color: #262626;
         }
 
+        /* Report Modal */
+        .report-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        }
+
+        .report-modal.show {
+            display: flex;
+        }
+
+        .report-modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .report-modal-content h2 {
+            margin-bottom: 15px;
+            color: #262626;
+            font-size: 1.4em;
+        }
+
+        .report-modal-content p {
+            margin-bottom: 20px;
+            color: #8e8e8e;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .media-id-box {
+            background: #f5f5f5;
+            border: 2px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            color: #262626;
+        }
+
+        .copy-btn {
+            background: #0095f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #0081d9;
+        }
+
+        .copy-btn.copied {
+            background: #00ba34;
+        }
+
+        .report-modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .report-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .report-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .report-btn-cancel {
+            background: #efefef;
+            color: #262626;
+        }
+
+        .report-btn-continue {
+            background: #ed4956;
+            color: white;
+        }
+
         .lightbox {
             position: fixed;
             top: 0;
@@ -502,6 +605,30 @@
         </div>
     </div>
 
+    <div class="report-modal" id="reportModal">
+        <div class="report-modal-content">
+            <h2>⚠️ Report This Image</h2>
+            <p>Please copy this Media ID. You'll need to paste it into the report form.</p>
+            
+            <div class="media-id-box" id="mediaIdDisplay">
+                <!-- Media ID will be inserted here -->
+            </div>
+            
+            <button class="copy-btn" id="copyBtn" onclick="copyMediaId()">
+                📋 Copy Media ID
+            </button>
+            
+            <p style="margin-top: 20px; font-size: 0.9em;">
+                After clicking Continue, the report form will open. Paste the Media ID in the form to submit your report.
+            </p>
+            
+            <div class="report-modal-buttons">
+                <button class="report-btn report-btn-cancel" onclick="closeReportModal()">Cancel</button>
+                <button class="report-btn report-btn-continue" onclick="openReportForm()">Continue to Form</button>
+            </div>
+        </div>
+    </div>
+
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" onclick="closeLightbox()">×</button>
         <button class="lightbox-nav lightbox-prev" onclick="prevMedia()">‹</button>
@@ -653,7 +780,7 @@
             const albumMedia = allMedia.filter(m => m.album_id === album.album_id);
             console.log('Portfolio media found:', albumMedia.length);
 
-            const portfolioMedia = albumMedia.slice(0, 12); // Show max 12 images
+            const portfolioMedia = albumMedia.slice(0, 20); // Show max 20 images
 
             const grid = document.getElementById('portfolioGrid');
             grid.innerHTML = '';
@@ -903,11 +1030,55 @@
             }
         }
 
+        let currentReportMediaId = '';
+        let currentReportUrl = '';
+
         function reportImage() {
             const media = currentAlbumMedia[currentMediaIndex];
-              const mediaId = media.media_id;  // Extracting the media ID
-            const reportUrl = `https://arrow-hub.com/dl/f2f9fa?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
-            window.open(reportUrl, '_blank');
+            currentReportMediaId = media.media_id;
+            
+            // Build the report URL
+            currentReportUrl = `https://arrow-hub.com/dl/f2f9fa?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
+            
+            // Show the modal with media ID
+            document.getElementById('mediaIdDisplay').textContent = currentReportMediaId;
+            document.getElementById('reportModal').classList.add('show');
+            
+            // Reset copy button state
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.textContent = '📋 Copy Media ID';
+            copyBtn.classList.remove('copied');
+        }
+
+        function copyMediaId() {
+            // Copy to clipboard
+            navigator.clipboard.writeText(currentReportMediaId).then(() => {
+                // Update button to show success
+                const copyBtn = document.getElementById('copyBtn');
+                copyBtn.textContent = '✓ Copied!';
+                copyBtn.classList.add('copied');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Copy Media ID';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy. Please manually select and copy the ID above.');
+            });
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('show');
+        }
+
+        function openReportForm() {
+            // Close the modal
+            closeReportModal();
+            
+            // Open the Glide form in a new tab
+            window.open(currentReportUrl, '_blank');
         }
 
         function getCookie(name) {
