@@ -653,7 +653,7 @@
             const albumMedia = allMedia.filter(m => m.album_id === album.album_id);
             console.log('Portfolio media found:', albumMedia.length);
 
-            const portfolioMedia = albumMedia.slice(0, 20); // Show max 20 images
+            const portfolioMedia = albumMedia.slice(0, 12); // Show max 12 images
 
             const grid = document.getElementById('portfolioGrid');
             grid.innerHTML = '';
