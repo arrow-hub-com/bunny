@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.2</title>
+    <title>Arrow Hub - Gallery v23.3</title>
     <style>
         * {
             margin: 0;
@@ -65,9 +65,9 @@
 
         .grid {
             display: grid;
-            gap: 1px;
+            gap: 3px;
             margin-bottom: 40px;
-            background: #000;
+            background: #FFFFFF;
         }
 
         .grid-4 {
@@ -85,7 +85,7 @@
             aspect-ratio: 3/4;
             overflow: hidden;
             cursor: pointer;
-            background: #000;
+            background: #FFFFFF;
         }
 
         .grid-item img {
@@ -140,9 +140,9 @@
 
         .album-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: #000;
+            grid-template-columns: (auto-fit, minmax(120px, 1fr));
+            gap: 3px;
+            background: #FFFFFF;
         }
 
         @media (max-width: 768px) {
@@ -167,7 +167,7 @@
             position: relative;
             aspect-ratio: 3/4;
             overflow: hidden;
-            background: #000;
+            background: #FFFFFF;
         }
 
         .album-card-cover img {
@@ -244,8 +244,8 @@
             background: white;
             padding: 40px;
             border-radius: 12px;
-            text-align: center;
             max-width: 400px;
+            text-align: center;
         }
 
         .age-verification-content h2 {
@@ -256,41 +256,37 @@
         .age-verification-content p {
             margin-bottom: 30px;
             color: #8e8e8e;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
-        .age-verification-content .buttons {
+        .age-verification-buttons {
             display: flex;
             gap: 15px;
-            justify-content: center;
         }
 
-        .age-verification-content button {
-            padding: 12px 30px;
+        .age-btn {
+            flex: 1;
+            padding: 15px;
             border: none;
             border-radius: 8px;
             font-size: 1em;
-            cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
 
-        .age-verification-content .confirm {
+        .age-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .age-btn-yes {
             background: #0095f6;
             color: white;
         }
 
-        .age-verification-content .confirm:hover {
-            background: #0081d8;
-        }
-
-        .age-verification-content .decline {
-            background: #dbdbdb;
+        .age-btn-no {
+            background: #efefef;
             color: #262626;
-        }
-
-        .age-verification-content .decline:hover {
-            background: #c7c7c7;
         }
 
         .lightbox {
@@ -304,7 +300,6 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            padding: 20px;
         }
 
         .lightbox.show {
@@ -317,43 +312,57 @@
             max-height: 90vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
         .lightbox-media {
-            max-width: 100%;
+            max-width: 90vw;
             max-height: 80vh;
             object-fit: contain;
         }
 
-        .lightbox-caption {
-            color: white;
-            margin-top: 20px;
-            text-align: center;
-            max-width: 600px;
+        .lightbox-video {
+            max-width: 90vw;
+            max-height: 80vh;
         }
 
-        .lightbox-controls {
+        .lightbox-caption {
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .lightbox-close {
             position: absolute;
             top: 20px;
             right: 20px;
-            display: flex;
-            gap: 15px;
-        }
-
-        .lightbox-controls button {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
             width: 40px;
             height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
             border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
             cursor: pointer;
-            font-size: 1.2em;
+            z-index: 10001;
+        }
+
+        .lightbox-report {
+            display: block;
+            margin: 10px auto 0 auto;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            cursor: pointer;
             transition: background 0.2s;
         }
 
-        .lightbox-controls button:hover {
+        .lightbox-report:hover {
             background: rgba(255,255,255,0.3);
         }
 
@@ -361,14 +370,14 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
             width: 50px;
             height: 50px;
+            background: rgba(255,255,255,0.2);
+            border: none;
             border-radius: 50%;
-            cursor: pointer;
+            color: white;
             font-size: 1.5em;
+            cursor: pointer;
             transition: background 0.2s;
         }
 
@@ -376,240 +385,301 @@
             background: rgba(255,255,255,0.3);
         }
 
-        .lightbox-nav.prev {
+        .lightbox-prev {
             left: 20px;
         }
 
-        .lightbox-nav.next {
+        .lightbox-next {
             right: 20px;
         }
 
-        .hidden {
-            display: none !important;
+        .load-more {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: block;
+        }
+
+        .load-more:hover {
+            background: #fafafa;
         }
 
         .loading {
             text-align: center;
             padding: 60px 20px;
             color: #8e8e8e;
-            font-size: 1.1em;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0095f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .empty-state {
             text-align: center;
             padding: 60px 20px;
+            color: #8e8e8e;
         }
 
         .empty-state-icon {
             font-size: 4em;
             margin-bottom: 20px;
+            opacity: 0.3;
         }
 
-        .empty-state p {
-            color: #8e8e8e;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-        }
-
-        .load-more-btn {
-            display: block;
-            margin: 40px auto;
-            padding: 12px 40px;
-            background: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .load-more-btn:hover {
-            background: #0081d8;
-        }
-
-        .load-more-btn.hidden {
-            display: none;
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="#" id="backButton" class="back-button">
-            ← Back to Portfolio
-        </a>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Loading gallery...</div>
+        </div>
 
-        <div id="portfolioView">
-            <div id="loading" class="loading">
-                Loading gallery...
-            </div>
+        <div id="mainContent" class="hidden">
+            <a href="#" class="back-button" id="backButton">
+                ← Back to Gallery
+            </a>
 
-            <div id="emptyState" class="empty-state hidden">
-                <div class="empty-state-icon">📸</div>
-                <p>No content available yet</p>
-                <p style="font-size: 0.9em;">Start uploading to see your gallery here</p>
-            </div>
-
-            <div id="portfolioContent" class="hidden">
-                <div class="portfolio-section">
+            <div id="portfolioView">
+                <div class="portfolio-section" id="portfolioSection">
                     <h2 class="section-title">Portfolio</h2>
-                    <div id="portfolioGrid" class="grid grid-4"></div>
+                    <div class="grid grid-4" id="portfolioGrid"></div>
                 </div>
 
                 <div class="albums-section">
                     <h2 class="section-title">Albums</h2>
-                    <div id="albumCards" class="album-cards"></div>
+                    <div class="album-cards" id="albumCards"></div>
                 </div>
             </div>
-        </div>
 
-        <div id="albumView" class="hidden">
-            <h2 id="albumViewTitle" class="section-title"></h2>
-            <div id="albumViewGrid" class="grid grid-4"></div>
-            <button id="loadMoreBtn" class="load-more-btn hidden" onclick="loadMoreMedia()">Load More</button>
+            <div id="albumView" class="hidden">
+                <h2 class="section-title" id="albumViewTitle"></h2>
+                <div class="grid grid-4" id="albumViewGrid"></div>
+                <button class="load-more hidden" id="loadMoreBtn" onclick="loadMoreMedia()">Load More</button>
+            </div>
+
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">📸</div>
+                <div>No photos yet</div>
+            </div>
         </div>
     </div>
 
-    <div id="ageVerification" class="age-verification">
+    <div class="age-verification" id="ageVerification">
         <div class="age-verification-content">
-            <h2>Age Verification Required</h2>
-            <p>This content is intended for viewers 18 years or older. By clicking "I'm 18+", you confirm that you are of legal age to view this material.</p>
-            <div class="buttons">
-                <button class="decline" onclick="declineAge()">Under 18</button>
-                <button class="confirm" onclick="confirmAge()">I'm 18+</button>
+            <h2>🔞 Age Verification</h2>
+            <p>This content may contain artistic nudity and mature themes. You must be 18 or older to view.</p>
+            <div class="age-verification-buttons">
+                <button class="age-btn age-btn-no" onclick="declineAge()">I'm under 18</button>
+                <button class="age-btn age-btn-yes" onclick="confirmAge()">I'm 18+</button>
             </div>
         </div>
     </div>
 
-    <div id="lightbox" class="lightbox" onclick="event.target === this && closeLightbox()">
-        <button class="lightbox-nav prev" onclick="prevMedia()">‹</button>
-        <button class="lightbox-nav next" onclick="nextMedia()">›</button>
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">×</button>
+        <button class="lightbox-nav lightbox-prev" onclick="prevMedia()">‹</button>
+        <button class="lightbox-nav lightbox-next" onclick="nextMedia()">›</button>
         <div class="lightbox-content">
-            <div class="lightbox-controls">
-                <button onclick="reportImage()" title="Report">🚩Report Image</button>
-                <button onclick="closeLightbox()" title="Close">✕</button>
-            </div>
-            <img id="lightboxImage" class="lightbox-media" alt="">
-            <video id="lightboxVideo" class="lightbox-media hidden" controls></video>
-            <div id="lightboxCaption" class="lightbox-caption"></div>
+            <img class="lightbox-media hidden" id="lightboxImage">
+            <video class="lightbox-video hidden" id="lightboxVideo" controls></video>
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+            <button class="lightbox-report" onclick="reportImage()">⚠️ Report</button>
         </div>
     </div>
 
     <script>
-        // Get user email from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userEmail = urlParams.get('user_email');
+        // Gallery Version 2.1 - JSON file based (no webhooks)
+        console.log('Arrow Hub Gallery v2.1 - JSON');
+        
+        const CONFIG = {
+            BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
+            BUNNY_STORAGE_URL: 'https://ny.storage.bunnycdn.com/arrow-hub'
+        };
 
-        if (!userEmail) {
-            document.getElementById('loading').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>No user specified</p></div>';
-            throw new Error('user_email required');
-        }
-
-        // Global state
-        let galleryData = null;
-        let isOver18 = localStorage.getItem('arrow_age_verified') === 'true';
-        let currentAlbum = null;
+        let userEmail = '';
+        let albums = [];
         let currentAlbumMedia = [];
-        let currentMediaIndex = 0;
         let displayedMediaCount = 0;
-        const MEDIA_PER_PAGE = 50;
+        const MEDIA_PER_PAGE = 24;
+        let currentMediaIndex = 0;
+        let isOver18 = false;
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('Initializing gallery for:', userEmail);
-            console.log('Age verified:', isOver18);
-            await loadGallery();
-        });
+        document.addEventListener('DOMContentLoaded', init);
 
-        async function loadGallery() {
-            try {
-                console.log('Loading gallery data from JSON...');
-                
-                // Encode email for URL (@ becomes %40)
-                const encodedEmail = encodeURIComponent(userEmail);
-                
-                // Fetch from Bunny CDN with cache buster
-                const response = await fetch(`https://arrow-hub.b-cdn.net/${encodedEmail}/gallery-data.json?v=${Date.now()}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const text = await response.text();
-                console.log('Gallery JSON loaded, length:', text.length);
-                
-                galleryData = JSON.parse(text);
-                console.log('Gallery data parsed:', galleryData);
-                
-                await renderGallery();
-                
-            } catch (error) {
-                console.error('Error loading gallery:', error);
-                showError('Could not load gallery. Please try again later.');
-            }
-        }
-
-        async function renderGallery() {
-            console.log('Rendering gallery...');
+        async function init() {
+            console.log('Gallery init started');
             
-            if (!galleryData || !galleryData.albums || galleryData.albums.length === 0) {
-                showEmptyState();
+            const params = new URLSearchParams(window.location.search);
+            userEmail = params.get('user_email') || 'arrowphtosuk@gmail.com';
+            
+            console.log('User email:', userEmail);
+
+            if (!userEmail) {
+                showError('No user profile specified');
                 return;
             }
 
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('portfolioContent').classList.remove('hidden');
+            const storedValue = localStorage.getItem('arrow_age_verified');
+            isOver18 = storedValue === 'true';
+            console.log('Age verified (localStorage):', storedValue);
+            console.log('isOver18 set to:', isOver18);
 
-            // Render portfolio (featured media from flat media array)
-            const portfolioGrid = document.getElementById('portfolioGrid');
-            portfolioGrid.innerHTML = '';
-            
-            // Use the flat media array, limit to 20 items
-            const portfolioMedia = galleryData.media ? galleryData.media.slice(0, 20) : [];
-
-            portfolioMedia.forEach((item, index) => {
-                const isNSFW = item.is_nsfw === 'TRUE' || item.is_nsfw === true;
-                const needsBlur = isNSFW && !isOver18;
-                const isVideo = item.is_video === 'TRUE' || item.is_video === true;
-
-                const gridItem = document.createElement('div');
-                gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
-                gridItem.onclick = () => {
-                    if (needsBlur) {
-                        showAgeVerification(() => openLightbox(galleryData.media, galleryData.media.indexOf(item)));
-                    } else {
-                        openLightbox(galleryData.media, galleryData.media.indexOf(item));
-                    }
-                };
-
-                gridItem.innerHTML = `
-                    <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
-                    ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
-                    ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
-                `;
-
-                portfolioGrid.appendChild(gridItem);
-            });
-
-            // Render album cards
-            renderAlbumCards();
+            await loadGallery();
         }
 
-        function renderAlbumCards() {
+        async function loadGallery() {
+            try {
+                console.log('loadGallery started');
+                
+                const response = await fetch(CONFIG.FETCH_ALBUMS_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_email: userEmail })
+                });
+
+                const text = await response.text();
+                console.log('Albums response:', text);
+                
+                albums = text ? JSON.parse(text) : [];
+                console.log('Parsed albums:', albums);
+
+                if (albums.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+
+                renderGallery();
+
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading gallery:', error);
+                showError('Could not load gallery');
+            }
+        }
+
+        function renderGallery() {
+            console.log('renderGallery called, isOver18:', isOver18);
+            
+            const featuredAlbum = albums.find(a => a.is_featured === 'TRUE');
+            const otherAlbums = albums.filter(a => a.is_featured !== 'TRUE');
+
+            if (featuredAlbum) {
+                renderPortfolio(featuredAlbum);
+                document.getElementById('portfolioSection').classList.remove('hidden');
+            } else {
+                document.getElementById('portfolioSection').classList.add('hidden');
+            }
+
+            renderAlbumCards(otherAlbums);
+            
+            console.log('renderGallery complete');
+        }
+
+        async function renderPortfolio(album) {
+            try {
+                console.log('Loading portfolio for album:', album.album_id);
+                
+                const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ album_id: album.album_id })
+                });
+
+                const text = await response.text();
+                console.log('Portfolio media response:', text);
+                
+                const media = text ? JSON.parse(text) : [];
+                console.log('Parsed portfolio media:', media);
+
+                const portfolioMedia = media.slice(0, 12);
+
+                const grid = document.getElementById('portfolioGrid');
+                grid.innerHTML = '';
+
+                if (portfolioMedia.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><p>No media in portfolio album</p></div>';
+                    return;
+                }
+
+                portfolioMedia.forEach((item, index) => {
+                    const isNSFW = item.is_nsfw === 'TRUE';
+                    const needsBlur = isNSFW && !isOver18;
+                    const isVideo = item.is_video === 'TRUE';
+
+                    const gridItem = document.createElement('div');
+                    gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
+                    gridItem.onclick = () => {
+                        if (needsBlur) {
+                            showAgeVerification(() => openLightbox(portfolioMedia, index));
+                        } else {
+                            openLightbox(portfolioMedia, index);
+                        }
+                    };
+
+                    gridItem.innerHTML = `
+                        <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
+                        ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
+                        ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
+                    `;
+
+                    grid.appendChild(gridItem);
+                });
+            } catch (error) {
+                console.error('Error loading portfolio media:', error);
+                document.getElementById('portfolioGrid').innerHTML = '<div class="empty-state"><p>Could not load portfolio</p></div>';
+            }
+        }
+
+        function renderAlbumCards(albumsList) {
             const container = document.getElementById('albumCards');
             container.innerHTML = '';
 
-            galleryData.albums.forEach(album => {
-                const isNSFW = album.is_nsfw === 'TRUE' || album.is_nsfw === true;
-                const needsBlur = isNSFW && !isOver18;
-                const coverUrl = album.cover_url;
-                // Count media items from flat array by filtering by album_id
-                const mediaCount = galleryData.media ? galleryData.media.filter(m => m.album_id === album.album_id).length : 0;
+            if (albumsList.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No albums yet</p></div>';
+                return;
+            }
 
+            albumsList.forEach(album => {
+                console.log('Rendering album:', album.album_title, 'is_nsfw:', album.is_nsfw, 'isOver18:', isOver18);
+                
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.onclick = () => openAlbum(album);
+
+                const isNSFW = album.is_nsfw === 'TRUE';
+                const needsBlur = isNSFW && !isOver18;
+                
+                console.log('needsBlur:', needsBlur);
+                
+                const coverUrl = album.cover_url || '';
+                const imageCount = parseInt(album.image_count) || 0;
+                const videoCount = parseInt(album.video_count) || 0;
+                const totalCount = imageCount + videoCount;
 
                 card.innerHTML = `
                     <div class="album-card-cover ${needsBlur ? 'blurred' : ''}">
@@ -619,7 +689,7 @@
                     <div class="album-card-info">
                         <div class="album-card-title">${album.album_title}</div>
                         <div class="album-card-description">${album.album_description || ''}</div>
-                        <div class="album-card-count">${mediaCount} items</div>
+                        <div class="album-card-count">${totalCount} items</div>
                     </div>
                 `;
 
@@ -628,7 +698,7 @@
         }
 
         async function openAlbum(album) {
-            const isNSFW = album.is_nsfw === 'TRUE' || album.is_nsfw === true;
+            const isNSFW = album.is_nsfw === 'TRUE';
             
             if (isNSFW && !isOver18) {
                 showAgeVerification(() => openAlbum(album));
@@ -636,32 +706,48 @@
             }
 
             currentAlbum = album;
-            
-            // Filter media from the flat media array by album_id
-            currentAlbumMedia = galleryData.media.filter(m => m.album_id === album.album_id);
-            displayedMediaCount = 0;
-            
-            console.log('Opening album:', currentAlbum.album_title, 'with', currentAlbumMedia.length, 'items');
+            console.log('Opening album, currentAlbum set to:', currentAlbum);
             
             document.getElementById('portfolioView').classList.add('hidden');
             document.getElementById('albumView').classList.remove('hidden');
             document.getElementById('backButton').classList.add('show');
             document.getElementById('albumViewTitle').textContent = album.album_title;
 
-            renderAlbumMedia();
+            await renderAlbumMedia(album);
         }
 
-        function renderAlbumMedia() {
-            const grid = document.getElementById('albumViewGrid');
-            grid.innerHTML = '';
+        async function renderAlbumMedia(album) {
+            try {
+                console.log('Loading media for album:', album.album_id);
+                
+                const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ album_id: album.album_id })
+                });
 
-            if (currentAlbumMedia.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><p>No media in this album</p></div>';
-                document.getElementById('loadMoreBtn').classList.add('hidden');
-                return;
+                const text = await response.text();
+                console.log('Album media response:', text);
+                
+                currentAlbumMedia = text ? JSON.parse(text) : [];
+                console.log('Parsed album media:', currentAlbumMedia);
+                displayedMediaCount = 0;
+
+                const grid = document.getElementById('albumViewGrid');
+                grid.innerHTML = '';
+
+                if (currentAlbumMedia.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><p>No media in this album</p></div>';
+                    document.getElementById('loadMoreBtn').classList.add('hidden');
+                    return;
+                }
+
+                loadMoreMedia();
+
+            } catch (error) {
+                console.error('Error loading album media:', error);
+                document.getElementById('albumViewGrid').innerHTML = '<div class="empty-state"><p>Could not load album</p></div>';
             }
-
-            loadMoreMedia();
         }
 
         function loadMoreMedia() {
@@ -671,9 +757,9 @@
 
             for (let i = startIndex; i < endIndex; i++) {
                 const item = currentAlbumMedia[i];
-                const isNSFW = item.is_nsfw === 'TRUE' || item.is_nsfw === true;
+                const isNSFW = item.is_nsfw === 'TRUE';
                 const needsBlur = isNSFW && !isOver18;
-                const isVideo = item.is_video === 'TRUE' || item.is_video === true;
+                const isVideo = item.is_video === 'TRUE';
 
                 const gridItem = document.createElement('div');
                 gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
@@ -707,6 +793,7 @@
         document.getElementById('backButton').onclick = (e) => {
             e.preventDefault();
             currentAlbum = null;
+            console.log('Back button clicked, currentAlbum set to null');
             displayedMediaCount = 0;
             document.getElementById('albumView').classList.add('hidden');
             document.getElementById('portfolioView').classList.remove('hidden');
@@ -725,17 +812,20 @@
             document.getElementById('ageVerification').classList.remove('show');
             
             console.log('Age confirmed, isOver18 now:', isOver18);
+            console.log('localStorage set:', localStorage.getItem('arrow_age_verified'));
             
-            // Execute callback if exists
+            // Execute callback if exists (opens lightbox)
             if (window.ageVerificationCallback) {
                 window.ageVerificationCallback();
                 window.ageVerificationCallback = null;
             }
             
-            // Re-render to remove blurs
+            // Re-render the gallery to remove all blurs
             if (currentAlbum) {
-                renderAlbumMedia();
+                // In album view
+                renderAlbumMedia(currentAlbum);
             } else {
+                // In main gallery view
                 renderGallery();
             }
         }
@@ -753,7 +843,7 @@
             document.getElementById('lightbox').classList.add('show');
             document.getElementById('lightboxCaption').textContent = media.caption || '';
 
-            if (media.is_video === 'TRUE' || media.is_video === true) {
+            if (media.is_video === 'TRUE') {
                 document.getElementById('lightboxImage').classList.add('hidden');
                 const video = document.getElementById('lightboxVideo');
                 video.src = media.media_url;
@@ -773,9 +863,9 @@
             video.pause();
             video.src = '';
             
-            // Re-render if age was just verified
+            // If we just verified age, re-render the current view to remove blurs
             if (isOver18 && currentAlbum) {
-                renderAlbumMedia();
+                renderAlbumMedia(currentAlbum);
             } else if (isOver18) {
                 renderGallery();
             }
@@ -795,8 +885,23 @@
 
         function reportImage() {
             const media = currentAlbumMedia[currentMediaIndex];
-            const reportUrl = `https://arrow-hub.com/dl/8ad30d?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
+            const reportUrl = `https://arrow-hub.com/dl/f2f9fa?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
             window.open(reportUrl, '_blank');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function setCookie(name, value, days) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            const cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+            document.cookie = cookie;
+            console.log('Cookie set:', cookie);
+            console.log('All cookies:', document.cookie);
         }
 
         function showEmptyState() {
