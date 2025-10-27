@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.4</title>
+    <title>Arrow Hub - Gallery v23.5</title>
     <style>
         * {
             margin: 0;
@@ -70,19 +70,23 @@
             background: #FFFFFF;
         }
 
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
         .grid-4 {
             grid-template-columns: repeat(4, 1fr);
         }
 
         @media (max-width: 768px) {
-            .grid-4 {
+            .grid-3, .grid-4 {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
 
         .grid-item {
             position: relative;
-            aspect-ratio: 3/4;
+            aspect-ratio: 1/1;  /* Square for Instagram style */
             overflow: hidden;
             cursor: pointer;
             background: #FFFFFF;
@@ -140,14 +144,14 @@
 
        .album-cards {
             display: grid;
-            grid-template-columns: (auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 3px;
             background: #FFFFFF;
         }
 
         @media (max-width: 768px) {
             .album-cards {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -159,13 +163,13 @@
         }
 
         .album-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .album-card-cover {
             position: relative;
-            aspect-ratio: 3/4;
+            aspect-ratio: 1/1;  /* Square thumbnails */
             overflow: hidden;
             background: #000;
         }
@@ -465,7 +469,7 @@
             <div id="portfolioView">
                 <div class="portfolio-section" id="portfolioSection">
                     <h2 class="section-title">Portfolio</h2>
-                    <div class="grid grid-4" id="portfolioGrid"></div>
+                    <div class="grid grid-3" id="portfolioGrid"></div>
                 </div>
 
                 <div class="albums-section">
@@ -613,59 +617,46 @@
             console.log('renderGallery complete');
         }
 
-        async function renderPortfolio(album) {
-            try {
-                console.log('Loading portfolio for album:', album.album_id);
-                
-                const response = await fetch(CONFIG.GET_ALBUM_MEDIA_WEBHOOK, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ album_id: album.album_id })
-                });
+        function renderPortfolio(album) {
+            console.log('Loading portfolio for album:', album.album_id);
+            
+            // Filter media from the already-loaded allMedia array
+            const albumMedia = allMedia.filter(m => m.album_id === album.album_id);
+            console.log('Portfolio media found:', albumMedia.length);
 
-                const text = await response.text();
-                console.log('Portfolio media response:', text);
-                
-                const media = text ? JSON.parse(text) : [];
-                console.log('Parsed portfolio media:', media);
+            const portfolioMedia = albumMedia.slice(0, 20); // Show max 20 images
 
-                const portfolioMedia = media.slice(0, 12);
+            const grid = document.getElementById('portfolioGrid');
+            grid.innerHTML = '';
 
-                const grid = document.getElementById('portfolioGrid');
-                grid.innerHTML = '';
-
-                if (portfolioMedia.length === 0) {
-                    grid.innerHTML = '<div class="empty-state"><p>No media in portfolio album</p></div>';
-                    return;
-                }
-
-                portfolioMedia.forEach((item, index) => {
-                    const isNSFW = item.is_nsfw === 'TRUE';
-                    const needsBlur = isNSFW && !isOver18;
-                    const isVideo = item.is_video === 'TRUE';
-
-                    const gridItem = document.createElement('div');
-                    gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
-                    gridItem.onclick = () => {
-                        if (needsBlur) {
-                            showAgeVerification(() => openLightbox(portfolioMedia, index));
-                        } else {
-                            openLightbox(portfolioMedia, index);
-                        }
-                    };
-
-                    gridItem.innerHTML = `
-                        <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
-                        ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
-                        ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
-                    `;
-
-                    grid.appendChild(gridItem);
-                });
-            } catch (error) {
-                console.error('Error loading portfolio media:', error);
-                document.getElementById('portfolioGrid').innerHTML = '<div class="empty-state"><p>Could not load portfolio</p></div>';
+            if (portfolioMedia.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><p>No media in portfolio album</p></div>';
+                return;
             }
+
+            portfolioMedia.forEach((item, index) => {
+                const isNSFW = item.is_nsfw === 'TRUE';
+                const needsBlur = isNSFW && !isOver18;
+                const isVideo = item.is_video === 'TRUE';
+
+                const gridItem = document.createElement('div');
+                gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
+                gridItem.onclick = () => {
+                    if (needsBlur) {
+                        showAgeVerification(() => openLightbox(portfolioMedia, index));
+                    } else {
+                        openLightbox(portfolioMedia, index);
+                    }
+                };
+
+                gridItem.innerHTML = `
+                    <img src="${item.thumb_url}?width=400" alt="" loading="lazy">
+                    ${needsBlur ? '<div class="blur-overlay">🔞</div>' : ''}
+                    ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
+                `;
+
+                grid.appendChild(gridItem);
+            });
         }
 
         function renderAlbumCards(albumsList) {
