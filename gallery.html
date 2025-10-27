@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v23.3</title>
+    <title>Arrow Hub - Gallery v23.4</title>
     <style>
         * {
             margin: 0;
@@ -138,7 +138,7 @@
             pointer-events: none;
         }
 
-        .album-cards {
+       .album-cards {
             display: grid;
             grid-template-columns: (auto-fit, minmax(120px, 1fr));
             gap: 3px;
@@ -167,7 +167,7 @@
             position: relative;
             aspect-ratio: 3/4;
             overflow: hidden;
-            background: #FFFFFF;
+            background: #000;
         }
 
         .album-card-cover img {
@@ -521,6 +521,7 @@
 
         let userEmail = '';
         let albums = [];
+        let allMedia = [];
         let currentAlbumMedia = [];
         let displayedMediaCount = 0;
         const MEDIA_PER_PAGE = 24;
@@ -554,17 +555,29 @@
             try {
                 console.log('loadGallery started');
                 
-                const response = await fetch(CONFIG.FETCH_ALBUMS_WEBHOOK, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_email: userEmail })
-                });
-
-                const text = await response.text();
-                console.log('Albums response:', text);
+                // Fetch the gallery JSON file from CDN
+                const jsonUrl = `${CONFIG.BUNNY_CDN_URL}/${userEmail}/gallery-data.json`;
+                console.log('Fetching JSON from:', jsonUrl);
                 
-                albums = text ? JSON.parse(text) : [];
-                console.log('Parsed albums:', albums);
+                const response = await fetch(jsonUrl);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        console.log('No gallery data found (404)');
+                        showEmptyState();
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Gallery data loaded:', data);
+                
+                albums = data.albums || [];
+                allMedia = data.media || [];
+                
+                console.log('Parsed albums:', albums.length);
+                console.log('Parsed media:', allMedia.length);
 
                 if (albums.length === 0) {
                     showEmptyState();
@@ -885,7 +898,7 @@
 
         function reportImage() {
             const media = currentAlbumMedia[currentMediaIndex];
-            const reportUrl = `https://arrow-hub.com/dl/f2f9fa?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
+            const reportUrl = `https://arrow-hub.com/dl/8ad30d?media_id=${media.media_id}&media_url=${encodeURIComponent(media.media_url)}&reported_by=${userEmail}&photographer=${userEmail}`;
             window.open(reportUrl, '_blank');
         }
 
