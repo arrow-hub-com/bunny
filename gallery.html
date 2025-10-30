@@ -767,6 +767,11 @@
             }
 
             // Only show non-portfolio albums in album cards
+            const albumsToShow = featuredAlbum ? otherAlbums : albums.slice(1);
+            renderAlbumCards(albumsToShow);
+            
+            console.log('renderGallery complete');
+        }
 
         function renderPortfolio(album) {
             console.log('Loading portfolio for album:', album.album_id);
