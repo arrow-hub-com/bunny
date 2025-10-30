@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v24.o</title>
+    <title>Arrow Hub - Gallery v25.1</title>
     <style>
         * {
             margin: 0;
@@ -767,7 +767,7 @@
             }
 
             // Only show non-portfolio albums in album cards
-            const albumsToShow = featuredAlbum ? otherAlbums : albums.slice(1);
+            const albumsToShow = albums; // Show all albums including featured
             renderAlbumCards(albumsToShow);
             
             console.log('renderGallery complete');
