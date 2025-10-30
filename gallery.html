@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow Hub - Gallery v24.o</title>
+    <title>Arrow Hub - Gallery v25</title>
     <style>
         * {
             margin: 0;
@@ -86,7 +86,7 @@
 
         .grid-item {
             position: relative;
-            aspect-ratio: 1/1;  /* Square for Instagram style */
+            aspect-ratio: 1/1;
             overflow: hidden;
             cursor: pointer;
             background: #FFFFFF;
@@ -169,7 +169,7 @@
 
         .album-card-cover {
             position: relative;
-            aspect-ratio: 1/1;  /* Square thumbnails */
+            aspect-ratio: 1/1;
             overflow: hidden;
             background: #000;
         }
@@ -260,27 +260,26 @@
         .age-verification-content p {
             margin-bottom: 30px;
             color: #8e8e8e;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .age-verification-buttons {
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            justify-content: center;
         }
 
-        .age-btn {
-            flex: 1;
-            padding: 15px;
+        .age-verification-buttons button {
+            padding: 12px 30px;
             border: none;
             border-radius: 8px;
             font-size: 1em;
-            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: opacity 0.2s;
         }
 
-        .age-btn:hover {
-            transform: translateY(-2px);
+        .age-verification-buttons button:hover {
+            opacity: 0.8;
         }
 
         .age-btn-yes {
@@ -289,111 +288,8 @@
         }
 
         .age-btn-no {
-            background: #efefef;
+            background: #dbdbdb;
             color: #262626;
-        }
-
-        /* Report Modal */
-        .report-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10001;
-        }
-
-        .report-modal.show {
-            display: flex;
-        }
-
-        .report-modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            max-width: 450px;
-            text-align: center;
-        }
-
-        .report-modal-content h2 {
-            margin-bottom: 15px;
-            color: #262626;
-            font-size: 1.4em;
-        }
-
-        .report-modal-content p {
-            margin-bottom: 20px;
-            color: #8e8e8e;
-            line-height: 1.6;
-            font-size: 0.95em;
-        }
-
-        .media-id-box {
-            background: #f5f5f5;
-            border: 2px solid #dbdbdb;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            font-family: monospace;
-            font-size: 0.9em;
-            word-break: break-all;
-            color: #262626;
-        }
-
-        .copy-btn {
-            background: #0095f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 0.9em;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: #0081d9;
-        }
-
-        .copy-btn.copied {
-            background: #00ba34;
-        }
-
-        .report-modal-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-
-        .report-btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .report-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .report-btn-cancel {
-            background: #efefef;
-            color: #262626;
-        }
-
-        .report-btn-continue {
-            background: #ed4956;
-            color: white;
         }
 
         .lightbox {
@@ -419,57 +315,41 @@
             max-height: 90vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
         .lightbox-media {
-            max-width: 90vw;
-            max-height: 80vh;
+            max-width: 100%;
+            max-height: 85vh;
             object-fit: contain;
-        }
-
-        .lightbox-video {
-            max-width: 90vw;
-            max-height: 80vh;
         }
 
         .lightbox-caption {
             color: white;
-            padding: 20px;
+            margin-top: 20px;
             text-align: center;
-            font-size: 1em;
             max-width: 600px;
-            margin: 0 auto;
         }
 
         .lightbox-close {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 40px;
-            height: 40px;
             background: rgba(255,255,255,0.2);
             border: none;
+            color: white;
+            font-size: 2em;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            color: white;
-            font-size: 1.5em;
             cursor: pointer;
-            z-index: 10001;
-        }
-
-        .lightbox-report {
-            display: block;
-            margin: 10px auto 0 auto;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            padding: 10px 15px;
-            font-size: 0.9em;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: background 0.2s;
         }
 
-        .lightbox-report:hover {
+        .lightbox-close:hover {
             background: rgba(255,255,255,0.3);
         }
 
@@ -477,14 +357,17 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
             background: rgba(255,255,255,0.2);
             border: none;
-            border-radius: 50%;
             color: white;
-            font-size: 1.5em;
+            font-size: 2em;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: background 0.2s;
         }
 
@@ -492,52 +375,126 @@
             background: rgba(255,255,255,0.3);
         }
 
-        .lightbox-prev {
+        .lightbox-nav.prev {
             left: 20px;
         }
 
-        .lightbox-next {
+        .lightbox-nav.next {
             right: 20px;
         }
 
-        .load-more {
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 15px;
-            background: white;
-            border: 1px solid #dbdbdb;
+        .lightbox-report {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
             border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
             cursor: pointer;
+            font-size: 0.9em;
             transition: background 0.2s;
-            display: block;
         }
 
-        .load-more:hover {
+        .lightbox-report:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .report-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        }
+
+        .report-modal.show {
+            display: flex;
+        }
+
+        .report-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .report-modal-content h3 {
+            margin-bottom: 20px;
+            color: #262626;
+        }
+
+        .report-modal-content p {
+            margin-bottom: 20px;
+            color: #8e8e8e;
+            line-height: 1.5;
+        }
+
+        .media-id-display {
             background: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-bottom: 20px;
+            word-break: break-all;
+            border: 1px solid #dbdbdb;
+        }
+
+        .report-modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .report-modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: opacity 0.2s;
+        }
+
+        .report-modal-buttons button:hover {
+            opacity: 0.8;
+        }
+
+        .copy-btn {
+            background: #0095f6;
+            color: white;
+        }
+
+        .copy-btn.copied {
+            background: #00ba34;
+        }
+
+        .report-btn {
+            background: #ed4956;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #dbdbdb;
+            color: #262626;
         }
 
         .loading {
-            text-align: center;
-            padding: 60px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
             color: #8e8e8e;
         }
 
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #0095f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .hidden {
+            display: none !important;
         }
 
         .empty-state {
@@ -549,248 +506,211 @@
         .empty-state-icon {
             font-size: 4em;
             margin-bottom: 20px;
-            opacity: 0.3;
         }
 
-        .hidden {
-            display: none !important;
+        .load-more {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .load-more-btn {
+            background: #0095f6;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: opacity 0.2s;
+        }
+
+        .load-more-btn:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <div>Loading gallery...</div>
+        <a href="#" id="backButton" class="back-button">
+            <span>←</span>
+            <span>Back</span>
+        </a>
+
+        <!-- Portfolio View (Main View) -->
+        <div id="portfolioView">
+            <!-- Portfolio Section (Featured Album - First 9) -->
+            <div class="portfolio-section" id="portfolioSection">
+                <h2 class="section-title">Portfolio</h2>
+                <div class="grid grid-3" id="portfolioGrid"></div>
+            </div>
+
+            <!-- Albums Section (All Albums) -->
+            <div class="albums-section">
+                <h2 class="section-title">Albums</h2>
+                <div class="album-cards" id="albumsGrid"></div>
+            </div>
         </div>
 
-        <div id="mainContent" class="hidden">
-            <a href="#" class="back-button" id="backButton">
-                ← Back to Gallery
-            </a>
-
-            <div id="portfolioView">
-                <div class="portfolio-section" id="portfolioSection">
-                    <h2 class="section-title">Portfolio</h2>
-                    <div class="grid grid-3" id="portfolioGrid"></div>
-                </div>
-
-                <div class="albums-section">
-                    <h2 class="section-title">Albums</h2>
-                    <div class="album-cards" id="albumCards"></div>
-                </div>
+        <!-- Album View (When Album Clicked) -->
+        <div id="albumView" class="hidden">
+            <h2 class="section-title" id="albumViewTitle"></h2>
+            <div class="grid grid-3" id="albumViewGrid"></div>
+            
+            <div class="load-more hidden" id="loadMoreContainer">
+                <button class="load-more-btn" id="loadMoreBtn" onclick="loadMoreMedia()">Load More</button>
             </div>
+        </div>
 
-            <div id="albumView" class="hidden">
-                <h2 class="section-title" id="albumViewTitle"></h2>
-                <div class="grid grid-4" id="albumViewGrid"></div>
-                <button class="load-more hidden" id="loadMoreBtn" onclick="loadMoreMedia()">Load More</button>
-            </div>
+        <div id="loading" class="loading">
+            <p>Loading gallery...</p>
+        </div>
 
-            <div class="empty-state hidden" id="emptyState">
-                <div class="empty-state-icon">📸</div>
-                <div>No photos yet</div>
-            </div>
+        <div id="emptyState" class="empty-state hidden">
+            <div class="empty-state-icon">📷</div>
+            <p>No albums found</p>
         </div>
     </div>
 
-    <div class="age-verification" id="ageVerification">
+    <!-- Age Verification Modal -->
+    <div id="ageVerification" class="age-verification">
         <div class="age-verification-content">
-            <h2>🔞 Age Verification</h2>
-            <p>This content may contain artistic nudity and mature themes. You must be 18 or older to view.</p>
+            <h2>Age Verification</h2>
+            <p>This content may contain sensitive material. You must be 18 or older to view it.</p>
             <div class="age-verification-buttons">
-                <button class="age-btn age-btn-no" onclick="declineAge()">I'm under 18</button>
-                <button class="age-btn age-btn-yes" onclick="confirmAge()">I'm 18+</button>
+                <button class="age-btn-yes" onclick="confirmAge()">I'm 18 or Older</button>
+                <button class="age-btn-no" onclick="declineAge()">Go Back</button>
             </div>
         </div>
     </div>
 
-    <div class="report-modal" id="reportModal">
-        <div class="report-modal-content">
-            <h2>⚠️ Report This Image</h2>
-            <p>Please copy this Media ID. You'll need to paste it into the report form.</p>
-            
-            <div class="media-id-box" id="mediaIdDisplay">
-                <!-- Media ID will be inserted here -->
-            </div>
-            
-            <button class="copy-btn" id="copyBtn" onclick="copyMediaId()">
-                📋 Copy Media ID
-            </button>
-            
-            <p style="margin-top: 20px; font-size: 0.9em;">
-                After clicking Continue, the report form will open. Paste the Media ID in the form to submit your report.
-            </p>
-            
-            <div class="report-modal-buttons">
-                <button class="report-btn report-btn-cancel" onclick="closeReportModal()">Cancel</button>
-                <button class="report-btn report-btn-continue" onclick="openReportForm()">Continue to Form</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="lightbox" id="lightbox">
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox">
         <button class="lightbox-close" onclick="closeLightbox()">×</button>
-        <button class="lightbox-nav lightbox-prev" onclick="prevMedia()">‹</button>
-        <button class="lightbox-nav lightbox-next" onclick="nextMedia()">›</button>
+        <button class="lightbox-nav prev" onclick="prevMedia()">‹</button>
+        <button class="lightbox-nav next" onclick="nextMedia()">›</button>
+        <button class="lightbox-report" onclick="reportImage()">🚩 Report</button>
+        
         <div class="lightbox-content">
-            <img class="lightbox-media hidden" id="lightboxImage">
-            <video class="lightbox-video hidden" id="lightboxVideo" controls></video>
-            <div class="lightbox-caption" id="lightboxCaption"></div>
-            <button class="lightbox-report" onclick="reportImage()">⚠️ Report</button>
+            <img id="lightboxImage" class="lightbox-media" src="" alt="">
+            <video id="lightboxVideo" class="lightbox-media hidden" controls></video>
+            <div id="lightboxCaption" class="lightbox-caption"></div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="report-modal">
+        <div class="report-modal-content">
+            <h3>Report Content</h3>
+            <p>To report this content, please copy the Media ID below and use the report form.</p>
+            <div class="media-id-display" id="mediaIdDisplay"></div>
+            <div class="report-modal-buttons">
+                <button class="copy-btn" id="copyBtn" onclick="copyMediaId()">📋 Copy Media ID</button>
+                <button class="report-btn" onclick="openReportForm()">Continue to Report</button>
+            </div>
+            <div style="margin-top: 10px;">
+                <button class="cancel-btn" style="width: 100%;" onclick="closeReportModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Gallery Version 2.1 - JSON file based (no webhooks)
-        console.log('Arrow Hub Gallery v2.1 - JSON');
-        
-        const CONFIG = {
-            BUNNY_CDN_URL: 'https://arrow-hub.b-cdn.net',
-            BUNNY_STORAGE_URL: 'https://ny.storage.bunnycdn.com/arrow-hub'
-        };
-
-        let userEmail = '';
-        let albums = [];
-        let allMedia = [];
-        let currentAlbumMedia = [];
+        const MEDIA_PER_PAGE = 50;
         let displayedMediaCount = 0;
-        const MEDIA_PER_PAGE = 24;
         let currentMediaIndex = 0;
-        let isOver18 = false;
+        let currentAlbumMedia = [];
+        let currentAlbum = null;
+        let allAlbums = [];
+        let allMedia = [];
+        let isOver18 = localStorage.getItem('arrow_age_verified') === 'true';
+        let userEmail = '';
+        let featuredAlbumId = '';
 
-        document.addEventListener('DOMContentLoaded', init);
+        const urlParams = new URLSearchParams(window.location.search);
+        userEmail = urlParams.get('email') || '';
 
-        async function init() {
-            console.log('Gallery init started');
-            
-            const params = new URLSearchParams(window.location.search);
-            userEmail = params.get('user_email') || 'arrowphtosuk@gmail.com';
-            
-            console.log('User email:', userEmail);
-
-            if (!userEmail) {
-                showError('No user profile specified');
-                return;
-            }
-
-            const storedValue = localStorage.getItem('arrow_age_verified');
-            isOver18 = storedValue === 'true';
-            console.log('Age verified (localStorage):', storedValue);
-            console.log('isOver18 set to:', isOver18);
-
-            await loadGallery();
+        if (!userEmail) {
+            showError('No user email provided');
+        } else {
+            loadGallery();
         }
 
         async function loadGallery() {
             try {
-                console.log('loadGallery started');
+                console.log('Loading gallery for:', userEmail);
                 
-                // Fetch the gallery JSON file from CDN
-                // Add timestamp to bust cache
-                const timestamp = new Date().getTime();
-                const jsonUrl = `${CONFIG.BUNNY_CDN_URL}/${userEmail}/gallery-data.json?v=${timestamp}`;
-                console.log('Fetching JSON from:', jsonUrl);
+                const albumsResponse = await fetch(`https://hook.eu2.make.com/8ksmg2bnhwlmsjuu31u0jmq4sfhskypn?email=${encodeURIComponent(userEmail)}&action=get_albums`);
                 
-                const response = await fetch(jsonUrl, {
-                    cache: 'no-store'
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        console.log('No gallery data found (404)');
-                        showEmptyState();
-                        return;
-                    }
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                if (!albumsResponse.ok) {
+                    throw new Error('Failed to load albums');
                 }
 
-                const data = await response.json();
-                console.log('Gallery data loaded:', data);
+                allAlbums = await albumsResponse.json();
+                console.log('Albums loaded:', allAlbums.length);
                 
-                albums = data.albums || [];
-                allMedia = data.media || [];
-                
-                console.log('Parsed albums:', albums.length);
-                console.log('Parsed media:', allMedia.length);
-
-                if (albums.length === 0) {
+                if (!allAlbums || allAlbums.length === 0) {
                     showEmptyState();
                     return;
                 }
 
-                renderGallery();
+                // Find featured album
+                featuredAlbumId = allAlbums.find(a => a.is_featured_album === 'TRUE')?.album_id || '';
+                console.log('Featured album ID:', featuredAlbumId);
+
+                // Load all media
+                const mediaResponse = await fetch(`https://hook.eu2.make.com/8ksmg2bnhwlmsjuu31u0jmq4sfhskypn?email=${encodeURIComponent(userEmail)}&action=get_media`);
+                
+                if (!mediaResponse.ok) {
+                    throw new Error('Failed to load media');
+                }
+
+                allMedia = await mediaResponse.json();
+                console.log('Media loaded:', allMedia.length);
 
                 document.getElementById('loading').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
+                renderGallery();
 
             } catch (error) {
                 console.error('Error loading gallery:', error);
-                showError('Could not load gallery');
+                showError('Failed to load gallery. Please try again.');
             }
         }
 
         function renderGallery() {
-            console.log('renderGallery called, isOver18:', isOver18);
-            console.log('Albums array:', albums);
+            console.log('Rendering gallery...');
             
-            // Log each album's is_featured value to debug
-            albums.forEach(a => {
-                console.log(`Album "${a.album_title}" - is_featured value:`, a.is_featured, 'type:', typeof a.is_featured);
-            });
+            // Render portfolio section (first 9 from featured album)
+            renderPortfolio();
             
-            // Check for featured album - handle multiple boolean formats
-            const featuredAlbum = albums.find(a => {
-                const featured = String(a.is_featured || '').trim().toUpperCase();
-                console.log(`Checking album "${a.album_title}" - featured value after trim: "${featured}"`);
-                return featured === 'TRUE' || featured === '1';
-            });
-            
-            const otherAlbums = albums.filter(a => {
-                const featured = String(a.is_featured || '').trim().toUpperCase();
-                return featured !== 'TRUE' && featured !== '1';
-            });
-            
-            console.log('Featured album:', featuredAlbum);
-            console.log('Other albums:', otherAlbums.length);
-
-            // TEMPORARY: Use first album as portfolio if no featured album found
-            const portfolioAlbum = featuredAlbum || albums[0];
-            console.log('Portfolio album (featured or first):', portfolioAlbum);
-
-            if (portfolioAlbum) {
-                renderPortfolio(portfolioAlbum);
-                document.getElementById('portfolioSection').classList.remove('hidden');
-            } else {
-                console.log('No albums at all!');
-                document.getElementById('portfolioSection').classList.add('hidden');
-            }
-
-            // Only show non-portfolio albums in album cards
-            const albumsToShow = featuredAlbum ? otherAlbums : albums.slice(1);
-            renderAlbumCards(albumsToShow);
-            
-            console.log('renderGallery complete');
+            // Render albums grid (all albums including featured)
+            renderAlbumsGrid();
         }
 
-        function renderPortfolio(album) {
-            console.log('Loading portfolio for album:', album.album_id);
+        function renderPortfolio() {
+            const portfolioGrid = document.getElementById('portfolioGrid');
+            const portfolioSection = document.getElementById('portfolioSection');
             
-            // Filter media from the already-loaded allMedia array
-            const albumMedia = allMedia.filter(m => m.album_id === album.album_id);
-            console.log('Portfolio media found:', albumMedia.length);
-
-            const portfolioMedia = albumMedia.slice(0, 9); // Show max 20 images
-
-            const grid = document.getElementById('portfolioGrid');
-            grid.innerHTML = '';
-
-            if (portfolioMedia.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><p>No media in portfolio album</p></div>';
+            if (!featuredAlbumId) {
+                portfolioSection.classList.add('hidden');
                 return;
             }
 
-            portfolioMedia.forEach((item, index) => {
+            // Get media from featured album, sorted by created_at (oldest first), limit 9
+            const featuredMedia = allMedia
+                .filter(m => m.album_id === featuredAlbumId)
+                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                .slice(0, 9);
+
+            console.log('Featured media:', featuredMedia.length);
+
+            if (featuredMedia.length === 0) {
+                portfolioSection.classList.add('hidden');
+                return;
+            }
+
+            portfolioSection.classList.remove('hidden');
+            portfolioGrid.innerHTML = '';
+
+            featuredMedia.forEach((item, index) => {
                 const isNSFW = item.is_nsfw === 'TRUE';
                 const needsBlur = isNSFW && !isOver18;
                 const isVideo = item.is_video === 'TRUE';
@@ -799,9 +719,9 @@
                 gridItem.className = `grid-item ${needsBlur ? 'blurred' : ''}`;
                 gridItem.onclick = () => {
                     if (needsBlur) {
-                        showAgeVerification(() => openLightbox(portfolioMedia, index));
+                        showAgeVerification(() => openLightbox(featuredMedia, index));
                     } else {
-                        openLightbox(portfolioMedia, index);
+                        openLightbox(featuredMedia, index);
                     }
                 };
 
@@ -811,63 +731,60 @@
                     ${isVideo ? '<div class="video-overlay">▶</div>' : ''}
                 `;
 
-                grid.appendChild(gridItem);
+                portfolioGrid.appendChild(gridItem);
             });
         }
 
-        function renderAlbumCards(albumsList) {
-            const container = document.getElementById('albumCards');
-            container.innerHTML = '';
+        function renderAlbumsGrid() {
+            const grid = document.getElementById('albumsGrid');
+            grid.innerHTML = '';
 
-            if (albumsList.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>No albums yet</p></div>';
-                return;
-            }
+            // Sort albums (featured first, then by name)
+            const sortedAlbums = [...allAlbums].sort((a, b) => {
+                if (a.is_featured_album === 'TRUE' && b.is_featured_album !== 'TRUE') return -1;
+                if (a.is_featured_album !== 'TRUE' && b.is_featured_album === 'TRUE') return 1;
+                return (a.album_title || '').localeCompare(b.album_title || '');
+            });
 
-            albumsList.forEach(album => {
-                console.log('Rendering album:', album.album_title, 'is_nsfw:', album.is_nsfw, 'isOver18:', isOver18);
+            sortedAlbums.forEach(album => {
+                const albumMedia = allMedia.filter(m => m.album_id === album.album_id);
+                const mediaCount = albumMedia.length;
                 
+                if (mediaCount === 0) return;
+
+                const coverMedia = albumMedia[0];
+                const isNSFW = album.is_nsfw === 'TRUE';
+
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.onclick = () => openAlbum(album);
 
-                const isNSFW = album.is_nsfw === 'TRUE';
-                const needsBlur = isNSFW && !isOver18;
-                
-                console.log('needsBlur:', needsBlur);
-                
-                const coverUrl = album.cover_url || '';
-                const imageCount = parseInt(album.image_count) || 0;
-                const videoCount = parseInt(album.video_count) || 0;
-                const totalCount = imageCount + videoCount;
-
                 card.innerHTML = `
-                    <div class="album-card-cover ${needsBlur ? 'blurred' : ''}">
-                        ${coverUrl ? `<img src="${coverUrl}?width=400" alt="${album.album_title}" loading="lazy">` : '<div style="background:#e0e0e0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#999;">No Cover</div>'}
+                    <div class="album-card-cover ${isNSFW && !isOver18 ? 'blurred' : ''}">
+                        <img src="${coverMedia.thumb_url}?width=400" alt="">
                         ${isNSFW ? '<div class="nsfw-badge">18+</div>' : ''}
                     </div>
                     <div class="album-card-info">
-                        <div class="album-card-title">${album.album_title}</div>
+                        <div class="album-card-title">${album.album_title || 'Untitled Album'}${album.is_featured_album === 'TRUE' ? ' ⭐' : ''}</div>
                         <div class="album-card-description">${album.album_description || ''}</div>
-                        <div class="album-card-count">${totalCount} items</div>
+                        <div class="album-card-count">${mediaCount} ${mediaCount === 1 ? 'item' : 'items'}</div>
                     </div>
                 `;
 
-                container.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        async function openAlbum(album) {
-            const isNSFW = album.is_nsfw === 'TRUE';
+        function openAlbum(album) {
+            console.log('Opening album:', album.album_title);
             
+            const isNSFW = album.is_nsfw === 'TRUE';
             if (isNSFW && !isOver18) {
                 showAgeVerification(() => openAlbum(album));
                 return;
             }
 
             currentAlbum = album;
-            console.log('Opening album, currentAlbum set to:', currentAlbum);
-            
             document.getElementById('portfolioView').classList.add('hidden');
             document.getElementById('albumView').classList.remove('hidden');
             document.getElementById('backButton').classList.add('show');
@@ -879,8 +796,11 @@
         function renderAlbumMedia(album) {
             console.log('Loading media for album:', album.album_id);
             
-            // Filter media from the already-loaded allMedia array
-            currentAlbumMedia = allMedia.filter(m => m.album_id === album.album_id);
+            // Filter media from the already-loaded allMedia array, sorted by created_at
+            currentAlbumMedia = allMedia
+                .filter(m => m.album_id === album.album_id)
+                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            
             console.log('Album media found:', currentAlbumMedia.length);
             
             displayedMediaCount = 0;
