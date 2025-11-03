@@ -71,11 +71,11 @@
         }
 
         .grid-3 {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(5, 1fr);
         }
 
         .grid-4 {
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
         }
 
         @media (max-width: 768px) {
@@ -782,7 +782,7 @@
             const albumMedia = allMedia.filter(m => m.album_id === album.album_id);
             console.log('Portfolio media found:', albumMedia.length);
 
-            const portfolioMedia = albumMedia.slice(0, 9); // Show max 20 images
+            const portfolioMedia = albumMedia.slice(0, 10); // Show max 10 images
 
             const grid = document.getElementById('portfolioGrid');
             grid.innerHTML = '';
